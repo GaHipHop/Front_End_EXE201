@@ -63,7 +63,9 @@ const Header = () => {
           </DropdownTrigger>
           <DropdownMenu>
             {items.map((item) => (
-              <DropdownItem key={item.key}>{item.label}</DropdownItem>
+              <DropdownItem key={item.key}>
+                <span className="font-poiret-one text-lg">{item.label}</span>
+              </DropdownItem>
             ))}
           </DropdownMenu>
         </Dropdown>
@@ -74,7 +76,7 @@ const Header = () => {
           About us
         </a>
       </div>
-      <div className="absolute left-1/2 transform -translate-x-1/2 text-[40px] font-plus-jakarta font-medium">
+      <div className="absolute left-1/2 transform -translate-x-1/2 text-[40px] font-bold font-poiret-one font-medium">
         Ga Hiphop
       </div>
       <div className="flex items-center space-x-4">
