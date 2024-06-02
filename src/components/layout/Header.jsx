@@ -71,7 +71,7 @@ const Header = () => {
         </Dropdown>
         <a
           href="/about"
-          className="block text-[22px] hover:underline hover:decoration-black"
+          className="block text-[22px] hover:underline hover:decoration-black decoration-1"
         >
           About us
         </a>
