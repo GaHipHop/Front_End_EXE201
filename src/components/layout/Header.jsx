@@ -15,6 +15,7 @@ import {
 
 const Header = () => {
   const [searchOpen, setSearchOpen] = useState(false);
+  const [isSticky, setIsSticky] = useState(false);
   const inputRef = useRef(null);
 
   const handleSearchClick = () => {
@@ -42,8 +43,24 @@ const Header = () => {
     }
   }, [searchOpen]);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setIsSticky(true);
+      } else {
+        setIsSticky(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   return (
-    <header className="flex justify-between items-center px-14 py-5 w-full text-black bg-white border-b border-black max-md:px-5">
+    <header className={`flex justify-between items-center px-14 py-5 w-full text-black bg-white border-b border-black max-md:px-5 transition-all duration-300 ease-in-out ${isSticky ? 'fixed top-0 left-0 shadow-lg z-50' : 'fixed z-40'}`}>
       <div className="flex items-center space-x-4 font-poiret-one">
         <a href="/" className="flex items-center space-x-4 font-poiret-one">
           <img
