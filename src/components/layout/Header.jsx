@@ -93,7 +93,7 @@ const Header = () => {
           About us
         </a>
       </div>
-      <div className="absolute left-1/2 transform -translate-x-1/2 text-[40px] font-bold font-poiret-one font-medium">
+      <div className="absolute left-1/2 transform -translate-x-1/2 text-[40px] font-medium font-poiret-one">
         Ga Hiphop
       </div>
       <div className="flex items-center space-x-4">
