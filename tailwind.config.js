@@ -1,6 +1,5 @@
 const { nextui } = require("@nextui-org/react");
 
-/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
     "./index.html",
@@ -15,8 +14,21 @@ module.exports = {
         'open-sans': ['"Open Sans"', 'sans-serif'],
         'poetsen-one' : ['"Poetsen One"', 'sans-serif']
       },
+      linearGradientDirections: { // Thêm định nghĩa cho hướng linear gradient
+        t: 'to top',
+        tr: 'to top right',
+        r: 'to right',
+        br: 'to bottom right',
+        b: 'to bottom',
+        bl: 'to bottom left',
+        l: 'to left',
+        tl: 'to top left',
+      },
+      colors: {
+        'custom-purple': '#EDAFDB', // Mã màu tùy chỉnh
+      },
     },
   },
   darkMode: "class",
-  plugins: [nextui()]
+  plugins: [nextui(), require('@tailwindcss/aspect-ratio')],
 }

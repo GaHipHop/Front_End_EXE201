@@ -12,7 +12,7 @@ function About() {
       <div className="relative">
         <img
           loading="lazy"
-          src="/src/assets/image/1.image.png"
+          src="https://cdn.builder.io/api/v1/image/assets/TEMP/56bb666e945d744c8fac97c6d588ebf8196715779e88ea6045dde2754112bf8f?apiKey=402c56a5a1d94d11bd24e7050966bb9d&"
           alt="background image"
           className="about-background-image"
           style={{ pointerEvents: "none" }}
