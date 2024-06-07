@@ -8,6 +8,7 @@ import Login from "./components/pages/Login";
 import Dashboard from "./components/admin/adminDashboard/Dashboard";
 import Product from "./components/pages/Product";
 import ProductDetail from "./components/pages/ProductDetail";
+import Transaction from "./components/admin/adminDashboard/Transaction";
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -17,6 +18,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/about" element={<About />} />
         <Route path="/login" element={<Login />} />
         <Route path="/admin/dashboard" element={<Dashboard />} />
+        <Route path="/admin/transaction" element={<Transaction />} />
         <Route path="/product" element={<Product />} />
         <Route path="/productDetail" element={<ProductDetail />} />
       </Routes>
