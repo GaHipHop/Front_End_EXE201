@@ -1,7 +1,4 @@
 import React, { useRef } from 'react';
-import Slider from 'react-slick';
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
 import Header from '../layout/Header';
 import Footer from '../layout/Footer';
 import { Link } from 'react-router-dom';
