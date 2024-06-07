@@ -1,7 +1,7 @@
 import React from "react";
+import Sidebar from "../adminLayout/Sidebar";
+import AdminHeader from "../adminLayout/AdminHeader";
 import { Button, Link } from "@nextui-org/react";
-import AdminHeader from "../AdminHeader";
-import Sidebar from "../Sidebar";
 
 function TransactionTable({ transactions }) {
   return (
@@ -68,7 +68,6 @@ function TransactionTableBody({ transactions }) {
             {transaction.name}
           </div>
           <div className="flex-1 flex justify-center items-center font-plus-jakarta">
-            {/* <Link href={`/transaction/${transaction.id}`} passHref> */}
             <Link href={`#`} passHref>
               <Button
                 as="a"
@@ -89,7 +88,7 @@ function TransactionTableBody({ transactions }) {
 function Pagination() {
   return (
     <div className="flex gap-5 self-center px-5 mt-2 text-base tracking-tight text-center text-black whitespace-nowrap max-md:mt-5">
-      <a href="/" className="underline">
+      <a href="#" className="underline">
         1
       </a>
       <a href="#">2</a>
@@ -174,14 +173,24 @@ function Transaction() {
   ];
 
   return (
-    <div className="bg-white">
-      <div className="flex gap-5 max-md:flex-col max-md:gap-0">
-        <Sidebar />
-        <main className="flex flex-col ml-5 w-[78%] max-md:ml-0 max-md:w-full">
-          <AdminHeader />
-          <TransactionTable transactions={transactions} />
-        </main>
-      </div>
+    <div className="h-screen bg-white flex">
+      {/* sidebar */}
+      <Sidebar />
+      {/* sidebar */}
+      <main className="flex flex-col w-full overflow-auto">
+        <header className="flex flex-col self-stretch my-auto max-md:mt-4 max-md:max-w-full">
+          <AdminHeader title="TRANSACTION" />
+          <section className="flex flex-col px-6 pt-6 mt-4 bg-white border-t border-solid border-black border-opacity-30 max-md:pr-5 max-md:max-w-full">
+            <div className="mx-4 max-md:mr-2.5 max-md:max-w-full">
+              <TransactionTable transactions={transactions} />
+            </div>
+            <section className="px-5 pt-5 pb-9 mt-5 bg-white rounded-3xl shadow-sm max-md:max-w-full">
+              <div className="flex gap-5 justify-between max-md:flex-col max-md:gap-0">
+              </div>
+            </section>
+          </section>
+        </header>
+      </main>
     </div>
   );
 }
