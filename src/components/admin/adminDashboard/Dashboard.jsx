@@ -1,6 +1,6 @@
 import React from "react";
-import Sidebar from "../Sidebar";
-import AdminHeader from "../AdminHeader";
+import AdminHeader from "../adminLayout/AdminHeader";
+import Sidebar from "../adminLayout/Sidebar";
 import {
   Dropdown,
   Button,
@@ -33,7 +33,7 @@ function Dashboard() {
 
       <main className="flex flex-col w-full overflow-auto">
         <header className="flex flex-col self-stretch my-auto max-md:mt-4 max-md:max-w-full">
-          <AdminHeader />
+          <AdminHeader title="DASHBOARD" />
           <section className="flex flex-col px-6 pt-6 mt-4 bg-white border-t border-solid border-black border-opacity-30 max-md:pr-5 max-md:max-w-full">
             <div className="mx-4 max-md:mr-2.5 max-md:max-w-full">
               <section className="grid grid-cols-4 gap-4 max-md:grid-cols-1">
