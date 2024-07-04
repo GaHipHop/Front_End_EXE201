@@ -4,7 +4,6 @@ import "./index.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Home from "./components/pages/Home";
 import About from "./components/pages/About";
-import Login from "./components/pages/Login";
 import Dashboard from "./components/admin/adminDashboard/Dashboard";
 import Product from "./components/pages/Product";
 import ProductDetail from "./components/pages/ProductDetail";

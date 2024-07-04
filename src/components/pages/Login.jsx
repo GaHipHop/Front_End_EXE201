@@ -2,8 +2,53 @@ import React from "react";
 import { Button, Checkbox } from "@nextui-org/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faLock } from "@fortawesome/free-solid-svg-icons";
+const Login = () => {
+  const [formData, setFormData] = useState({
+    username: "",
+    password: "",
+    isRemeber: "",
+  });
+  const login = useAuthStore((state) => state.login);
 
-function Login() {
+  const hanndleLogin = async () => {
+    console.log(formData);
+    setLoading(true);
+    setError("");
+    try {
+      const response = await postLogin(formData);
+      console.log(response);
+
+      const { token, user } = response.data.data; // Chú ý thay đổi đường dẫn để truy cập `data`
+
+      console.log(token, user.username);
+
+      const userInfo = { ...user, token };
+      login(token, userInfo);
+      toast.success("Login Successful");
+      setTimeout(() => {
+        user.username === "admin"
+          ? router.push("/admin/dashboard")
+          : router.push("/");
+      }, 1000);
+    } catch (error) {
+      // Handle login error
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        const err = error.response.data.message;
+        console.log(error);
+
+        toast.error(err);
+        setError(error.response.data.message);
+      } else {
+        console.error("An unexpected error occurred:", error);
+      }
+    }
+    setLoading(false);
+  };
+
   return (
     <section className="flex overflow-hidden relative flex-col justify-center items-center px-16 py-20 min-h-screen max-md:px-5">
       <img
@@ -35,6 +80,9 @@ function Login() {
             <input
               type="text"
               placeholder="Username"
+              onChange={(e) => {
+                handleDataChange("username", e.target.value);
+              }}
               className="pl-10 p-2 border rounded-full w-full shadow"
             />
           </div>
@@ -46,20 +94,32 @@ function Login() {
             <input
               type="password"
               placeholder="Password"
+              onChange={(e) => {
+                handleDataChange("password", e.target.value);
+              }}
               className="pl-10 p-2 border rounded-full w-full shadow"
             />
           </div>
           <div className="relative w-full max-w-sm mb-4 ml-8 flex items-center">
             <Checkbox id="rememberMe" defaultSelected className="mr-1 " />
-            <label htmlFor="rememberMe" className="text-gray-700 mb-1">Remember Me</label>
+            onChange=
+            {(e) => {
+              handleDataChange("isRemember", e.target.checked);
+            }}
+            <label htmlFor="rememberMe" className="text-gray-700 mb-1">
+              Remember Me
+            </label>
           </div>
-          <Button className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-8 rounded-full shadow transition duration-300 ease-in-out transform hover:scale-105">
+          <Button
+            className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-8 rounded-full shadow transition duration-300 ease-in-out transform hover:scale-105"
+            onClick={hanndleLogin}
+          >
             Login
           </Button>
         </div>
       </div>
     </section>
   );
-}
+};
 
 export default Login;
