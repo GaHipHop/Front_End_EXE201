@@ -1,14 +1,16 @@
 import React from "react";
+import useAuthStore from "../../lib/axiosCustomize";
 import { Button, Checkbox } from "@nextui-org/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faLock } from "@fortawesome/free-solid-svg-icons";
+import { postLogin } from "../../lib/service/authService";
 const Login = () => {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
     isRemeber: "",
   });
-  const login = useAuthStore((state) => state.login);
+  const login = useAuthStore ((state) => state.login);
 
   const hanndleLogin = async () => {
     console.log(formData);
