@@ -5,6 +5,8 @@ import Dashboard from "./components/admin/adminDashboard/Dashboard";
 import Transaction from "./components/admin/adminDashboard/Transaction";
 import About from "./components/pages/About";
 import Home from "./components/pages/Home";
+import AdminProduct from "./components/admin/adminDashboard/AdminProduct"
+import AdminCategory from "./components/admin/adminDashboard/AdminCategory"
 import Login from "./components/pages/Login";
 import Product from "./components/pages/Product";
 import ProductDetail from "./components/pages/ProductDetail";
