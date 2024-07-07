@@ -1,54 +1,71 @@
-import React from "react";
-import useAuthStore from "../../lib/axiosCustomize";
-import { Button, Checkbox } from "@nextui-org/react";
+import { faLock, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faLock } from "@fortawesome/free-solid-svg-icons";
+import { Button, Checkbox } from "@nextui-org/react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
 import { postLogin } from "../../lib/service/authService";
+
 const Login = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
     password: "",
-    isRemeber: "",
+    isRemember: false,
   });
-  const login = useAuthStore ((state) => state.login);
 
-  const hanndleLogin = async () => {
-    console.log(formData);
+  const [loading, setLoading] = useState(false);
+
+  // Placeholder function for login handling
+  const login = (userInfo) => {
+    // Simulated login function, replace with actual implementation
+    console.log("User logged in:", userInfo);
+  };
+
+  const handleDataChange = (key, value) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [key]: value,
+    }));
+  };
+
+  const handleLogin = async () => {
     setLoading(true);
-    setError("");
+
     try {
       const response = await postLogin(formData);
-      console.log(response);
+      const { token, loginResponse } = response.data.data;
 
-      const { token, user } = response.data.data; // Chú ý thay đổi đường dẫn để truy cập `data`
+      const userInfo = {
+        id: loginResponse.id,
+        username: loginResponse.userName,
+        fullName: loginResponse.fullName,
+        roleId: loginResponse.roleId,
+        email: loginResponse.email,
+        token: token,
+      };
 
-      console.log(token, user.username);
+      localStorage.setItem("token", token);
+      localStorage.setItem("userInfo", JSON.stringify(userInfo));
 
-      const userInfo = { ...user, token };
-      login(token, userInfo);
+      login(userInfo); // Call the login function with userInfo
       toast.success("Login Successful");
+
       setTimeout(() => {
-        user.username === "admin"
-          ? router.push("/admin/dashboard")
-          : router.push("/");
+        if (loginResponse.roleId === 1) {
+          navigate("/admin/Dashboard");
+        } else {
+          navigate("/");
+        }
       }, 1000);
     } catch (error) {
-      // Handle login error
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
-        const err = error.response.data.message;
-        console.log(error);
-
-        toast.error(err);
-        setError(error.response.data.message);
-      } else {
-        console.error("An unexpected error occurred:", error);
-      }
+      setLoading(false);
+      toast.error("Login Failed. Please check your credentials.");
+      console.error("Login Error:", error); // Log the error for debugging
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -58,7 +75,7 @@ const Login = () => {
         src="/src/assets/image/loginBG.png"
         alt=""
         className="object-cover absolute inset-0 w-full h-full"
-        style={{ zIndex: -1 }} // Set z-index to push the image to the background
+        style={{ zIndex: -1 }}
       />
       <div className="relative z-10 flex flex-col md:flex-row items-center justify-center w-full max-w-2xl bg-pink-100 bg-opacity-80 p-8 rounded-lg shadow-lg">
         <div className="flex flex-col items-center justify-center w-full md:w-1/2 p-4">
@@ -82,9 +99,7 @@ const Login = () => {
             <input
               type="text"
               placeholder="Username"
-              onChange={(e) => {
-                handleDataChange("username", e.target.value);
-              }}
+              onChange={(e) => handleDataChange("username", e.target.value)}
               className="pl-10 p-2 border rounded-full w-full shadow"
             />
           </div>
@@ -96,27 +111,28 @@ const Login = () => {
             <input
               type="password"
               placeholder="Password"
-              onChange={(e) => {
-                handleDataChange("password", e.target.value);
-              }}
+              onChange={(e) => handleDataChange("password", e.target.value)}
               className="pl-10 p-2 border rounded-full w-full shadow"
             />
           </div>
           <div className="relative w-full max-w-sm mb-4 ml-8 flex items-center">
-            <Checkbox id="rememberMe" defaultSelected className="mr-1 " />
-            onChange=
-            {(e) => {
-              handleDataChange("isRemember", e.target.checked);
-            }}
+            <Checkbox
+              id="rememberMe"
+              defaultChecked={formData.isRemember}
+              onChange={(e) =>
+                handleDataChange("isRemember", e.target.checked)
+              }
+              className="mr-1"
+            />
             <label htmlFor="rememberMe" className="text-gray-700 mb-1">
               Remember Me
             </label>
           </div>
           <Button
             className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-8 rounded-full shadow transition duration-300 ease-in-out transform hover:scale-105"
-            onClick={hanndleLogin}
+            onClick={handleLogin}
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </Button>
         </div>
       </div>

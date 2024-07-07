@@ -1,14 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import "./index.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Home from "./components/pages/Home";
-import About from "./components/pages/About";
 import Dashboard from "./components/admin/adminDashboard/Dashboard";
+import Transaction from "./components/admin/adminDashboard/Transaction";
+import About from "./components/pages/About";
+import Home from "./components/pages/Home";
+import Login from "./components/pages/Login";
 import Product from "./components/pages/Product";
 import ProductDetail from "./components/pages/ProductDetail";
-import Transaction from "./components/admin/adminDashboard/Transaction";
-import Login from "./components/pages/Login";
+import "./index.css";
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -22,8 +22,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/product" element={<Product />} />
         <Route path="/productDetail" element={<ProductDetail />} />
         
-        <Route path="/admin/products" element={<AdminProduct />} />
-        <Route path="/admin/categories" element={<AdminCategory />} />
+        {/* <Route path="/admin/products" element={<AdminProduct />} /> */}
+        {/* <Route path="/admin/categories" element={<AdminCategory />} /> */}
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

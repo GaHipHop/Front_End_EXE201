@@ -1,197 +1,291 @@
-import React from "react";
-import Sidebar from "../adminLayout/Sidebar";
-import AdminHeader from "../adminLayout/AdminHeader";
-import { Button, Link } from "@nextui-org/react";
+import { Box, Button, Menu, MenuItem, Modal, Typography } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { getOrdersByStatusConfirmed, getOrdersByStatusPending, getOrdersByStatusRejected, updateStatusOrderConfirmed } from '../../../lib/service/orderService';
+import AdminHeader from '../adminLayout/AdminHeader';
+import Sidebar from '../adminLayout/Sidebar';
 
-function TransactionTable({ transactions }) {
+function Transaction() {
+  const [transactions, setTransactions] = useState([]);
+  const [filteredTransactions, setFilteredTransactions] = useState([]);
+  const [currentTab, setCurrentTab] = useState('pending'); // Initial tab value
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  useEffect(() => {
+    fetchTransactions(currentTab);
+  }, [currentTab]);
+
+  const fetchTransactions = async (tabValue) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No token found');
+      }
+
+      let response;
+      switch (tabValue) {
+        case 'pending':
+          response = await getOrdersByStatusPending('', 1, 10, token);
+          break;
+        case 'confirm':
+          response = await getOrdersByStatusConfirmed('', 1, 10, token);
+          break;
+        case 'reject':
+          response = await getOrdersByStatusRejected('', 1, 10, token);
+          break;
+        default:
+          throw new Error(`Unsupported tab value: ${tabValue}`);
+      }
+
+      console.log('Fetched transactions:', response.data);
+      setTransactions(response.data);
+      setFilteredTransactions(response.data); // Update both transactions and filtered transactions
+    } catch (error) {
+      console.error('Error fetching transactions:', error.message);
+      // Handle error states as needed
+    }
+  };
+
+  const handleTabChange = (tabValue) => {
+    setCurrentTab(tabValue);
+  };
+
+  const handleSearch = (event) => {
+    const searchTerm = event.target.value.toLowerCase();
+    const filtered = transactions.filter(transaction =>
+      transaction.orderCode.toLowerCase().includes(searchTerm)
+    );
+    setFilteredTransactions(filtered);
+  };
+
+  const handleDetailsClick = (event, transaction) => {
+    setSelectedTransaction(transaction);
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedTransaction(null);
+  };
+
+  const confirmOrder = async (orderId) => {
+    try {
+      const token = localStorage.getItem('token');
+      console.log(token);
+      if (!token) {
+        throw new Error('No token found');
+      }
+
+      console.log(`Sending request to confirm order with ID: ${orderId}`);
+    console.log(`Token: ${token}`);
+    
+      const response = await updateStatusOrderConfirmed(orderId, token);
+      console.log('Order confirmed:', response.data);
+
+      // Update transactions list after confirming the order
+      fetchTransactions(currentTab);
+    } catch (error) {
+      if (error.response) {
+        // Server responded with a status other than 200 range
+        console.error('Error confirming order:', error.response.data);
+        console.error('Status code:', error.response.status);
+        console.error('Headers:', error.response.headers);
+      } else if (error.request) {
+        // Request was made but no response received
+        console.error('Error confirming order: No response received');
+        console.error(error.request);
+      } else {
+        // Something else caused the error
+        console.error('Error confirming order:', error.message);
+      }
+    }
+  };
+
+  const handleMenuItemClick = (option) => {
+    setAnchorEl(null);
+    switch (option) {
+      case 'details':
+        setIsModalOpen(true);
+        break;
+      case 'confirm':
+        if (selectedTransaction) {
+          confirmOrder(selectedTransaction.id);
+        }
+        break;
+      case 'reject':
+        // Add logic for delete
+        break;
+      default:
+        break;
+    }
+  };
+
+  return (
+    <div className="h-screen bg-white flex">
+      <Sidebar />
+      <main className="flex flex-col w-full overflow-auto">
+        <header className="admin-header">
+          <AdminHeader title="TRANSACTION" />
+        </header>
+        <style>
+          {`
+            .custom-button {
+              color: black;
+              background-color: #d3d3d3;
+            }
+            .custom-button.selected {
+              background-color: #f4bbff;
+            }
+            .custom-button:hover {
+              background-color: lightgray;
+            }
+          `}
+        </style>
+        <section className="flex flex-col px-6 pt-6 mt-4 bg-white border-t border-solid border-black border-opacity-30 max-md:pr-5 max-md:max-w-full">
+          <div className="mx-4 max-md:mr-2.5 max-md:max-w-full flex justify-between items-center">
+            <input
+              type="text"
+              placeholder="Search..."
+              className="px-3 py-1.5 rounded-2xl border border-gray-300 focus:outline-none focus:border-pink-300 w-1/3"
+              onChange={handleSearch}
+            />
+            <div className="flex space-x-4">
+              <Button
+                onClick={() => handleTabChange('pending')}
+                className={`custom-button ${currentTab === 'pending' ? 'selected' : ''}`}
+              >
+                Pending
+              </Button>
+              <Button
+                onClick={() => handleTabChange('confirm')}
+                className={`custom-button ${currentTab === 'confirm' ? 'selected' : ''}`}
+              >
+                Confirm
+              </Button>
+              <Button
+                onClick={() => handleTabChange('reject')}
+                className={`custom-button ${currentTab === 'reject' ? 'selected' : ''}`}
+              >
+                Reject
+              </Button>
+            </div>
+          </div>
+          <TransactionTable transactions={filteredTransactions} onDetailsClick={handleDetailsClick} />
+        </section>
+      </main>
+
+      {selectedTransaction && (
+        <>
+          <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+            <MenuItem onClick={() => handleMenuItemClick('details')}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <i className="material-icons">info</i>
+                <span style={{ marginLeft: 8 }}>Details</span>
+              </div>
+            </MenuItem>
+            <MenuItem onClick={() => handleMenuItemClick('confirm')}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <i className="material-icons">check</i>
+                <span style={{ marginLeft: 8 }}>Confirm</span>
+              </div>
+            </MenuItem>
+            <MenuItem onClick={() => handleMenuItemClick('reject')}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <i className="material-icons">cancel</i>
+                <span style={{ marginLeft: 8 }}>Reject</span>
+              </div>
+            </MenuItem>
+          </Menu>
+          <Modal open={isModalOpen} onClose={handleCloseModal}>
+            <Box sx={{ p: 4, bgcolor: 'background.paper', borderRadius: 1, width: '600px', mx: 'auto' }}>
+              <Typography variant="h6">Transaction Details</Typography>
+              <Typography variant="body1">Order Code: {selectedTransaction.orderCode}</Typography>
+              <Typography variant="body1">Payment Method: {selectedTransaction.paymentMethod}</Typography>
+              <Typography variant="body1">Create Date: {new Date(selectedTransaction.createDate).toLocaleDateString()}</Typography>
+              <Typography variant="body1">Total Price: {selectedTransaction.totalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</Typography>
+              <Typography variant="body1">User Name: {selectedTransaction.userInfo.userName}</Typography>
+              {/* Add any other transaction details here */}
+              <Button onClick={handleCloseModal} className="mt-2">Close</Button>
+            </Box>
+          </Modal>
+        </>
+      )}
+    </div>
+  );
+}
+
+function TransactionTable({ transactions, onDetailsClick }) {
   return (
     <section className="flex flex-col items-start text-base font-medium tracking-tight text-center text-black max-md:flex-wrap max-md:pr-5">
       <div className="flex justify-between w-full px-2.5 py-2.5 bg-white">
         <div className="flex-1 flex justify-center items-center">
-          <span>Transaction ID</span>
-          <img
-            loading="lazy"
-            src="https://cdn.builder.io/api/v1/image/assets/TEMP/5c1464cb22b146ac3bc2043e1b4ed429fb597dbb98baa6cb1fcd8be106992207?apiKey=402c56a5a1d94d11bd24e7050966bb9d&"
-            alt=""
-            className="shrink-0 my-auto w-4 aspect-square"
-          />
+          <span>Order Code</span>
         </div>
         <div className="flex-1 flex justify-center items-center">
-          <span>Address</span>
+          <span>Payment Method</span>
         </div>
         <div className="flex-1 flex justify-center items-center">
-          <span>Date</span>
+          <span>Create Date</span>
         </div>
         <div className="flex-1 flex justify-center items-center">
-          <span>VND</span>
+          <span>Total Price</span>
         </div>
         <div className="flex-1 flex justify-center items-center">
-          <span>Customers</span>
-          <img
-            loading="lazy"
-            src="https://cdn.builder.io/api/v1/image/assets/TEMP/b9cedf493e57c7b085f3341928e0c919d74ff21e556d9350d03d5d8207c232a3?apiKey=402c56a5a1d94d11bd24e7050966bb9d&"
-            alt=""
-            className="shrink-0 my-auto w-4 aspect-square"
-          />
+          <span>User Name</span>
         </div>
         <div className="flex-1 flex justify-center items-center">
-          <span>Details</span>
+
         </div>
       </div>
-      <TransactionTableBody transactions={transactions} />
-      <Pagination />
+      <TransactionTableBody transactions={transactions} onDetailsClick={onDetailsClick} />
     </section>
   );
 }
 
-function TransactionTableBody({ transactions }) {
+function TransactionTableBody({ transactions, onDetailsClick }) {
   return (
     <>
-      {transactions.map((transaction, index) => (
+      {transactions.map((transaction) => (
         <div
-          key={index}
+          key={transaction.id}
           className="flex justify-between w-full px-2.5 py-2.5 text-base tracking-tight text-black bg-white max-md:flex-wrap"
         >
           <div className="flex-1 flex justify-center items-center text-center font-plus-jakarta break-words">
-            {transaction.id}
+            {transaction.orderCode}
           </div>
           <div className="flex-1 flex justify-center items-center text-center font-plus-jakarta break-words">
-            {transaction.location}
+            {transaction.paymentMethod}
           </div>
           <div className="flex-1 flex justify-center items-center text-center font-plus-jakarta break-words">
-            {transaction.date}
+            {new Date(transaction.createDate).toLocaleDateString()}
           </div>
           <div className="flex-1 flex justify-center items-center text-center font-plus-jakarta break-words">
-            {transaction.amount}
+            {transaction.totalPrice.toLocaleString('vi-VN', {
+              style: 'currency',
+              currency: 'VND',
+            })}
           </div>
           <div className="flex-1 flex justify-center items-center text-center font-plus-jakarta break-words">
-            {transaction.name}
+            {transaction.userInfo.userName}
           </div>
           <div className="flex-1 flex justify-center items-center font-plus-jakarta">
-            <Link href={`#`} passHref>
-              <Button
-                as="a"
-                className="px-3 text-center whitespace-nowrap rounded-2xl text-white bg-pink-300 border-2 border-solid border-white"
-                auto
-                flat
-              >
-                Details
-              </Button>
-            </Link>
+          <Button
+              onClick={(event) => onDetailsClick(event, transaction)}
+              className="bold-text px-3 text-center whitespace-nowrap rounded-2xl text-white bg-pink-300 border-2 border-solid border-white"
+              auto
+              flat
+            >
+              ...
+            </Button>
           </div>
         </div>
       ))}
     </>
-  );
-}
-
-function Pagination() {
-  return (
-    <div className="flex gap-5 self-center px-5 mt-2 text-base tracking-tight text-center text-black whitespace-nowrap max-md:mt-5">
-      <a href="#" className="underline">
-        1
-      </a>
-      <a href="#">2</a>
-      <a href="#">3</a>
-      <a href="#">4</a>
-    </div>
-  );
-}
-
-function Transaction() {
-  const transactions = [
-    {
-      id: "HI-0001",
-      location: "Thủ Đức",
-      date: "25-03-2024",
-      amount: "80,000",
-      name: "Đào Tiến Phát",
-    },
-    {
-      id: "HI-0002",
-      location: "Thủ Đức",
-      date: "25-03-2024",
-      amount: "80,000",
-      name: "Đào Tiến Phát",
-    },
-    {
-      id: "HI-0003",
-      location: "Thủ Đức",
-      date: "25-03-2024",
-      amount: "80,000",
-      name: "Đào Tiến Phát",
-    },
-    {
-      id: "HI-0004",
-      location: "Thủ Đức",
-      date: "25-03-2024",
-      amount: "80,000",
-      name: "Đào Tiến Phát",
-    },
-    {
-      id: "HI-0005",
-      location: "Thủ Đức",
-      date: "25-03-2024",
-      amount: "80,000",
-      name: "Đào Tiến Phát",
-    },
-    {
-      id: "HI-0006",
-      location: "Thủ Đức",
-      date: "25-03-2024",
-      amount: "80,000",
-      name: "Đào Tiến Phát",
-    },
-    {
-      id: "HI-0007",
-      location: "Thủ Đức",
-      date: "25-03-2024",
-      amount: "80,000",
-      name: "Đào Tiến Phát",
-    },
-    {
-      id: "HI-0008",
-      location: "Thủ Đức",
-      date: "25-03-2024",
-      amount: "80,000",
-      name: "Đào Tiến Phát",
-    },
-    {
-      id: "HI-0009",
-      location: "Thủ Đức",
-      date: "25-03-2024",
-      amount: "80,000",
-      name: "Đào Tiến Phát",
-    },
-    {
-      id: "HI-0010",
-      location: "Thủ Đức",
-      date: "25-03-2024",
-      amount: "80,000",
-      name: "Đào Tiến Phát",
-    },
-  ];
-
-  return (
-    <div className="h-screen bg-white flex">
-      {/* sidebar */}
-      <Sidebar />
-      {/* sidebar */}
-      <main className="flex flex-col w-full overflow-auto">
-        <header className="flex flex-col self-stretch my-auto max-md:mt-4 max-md:max-w-full">
-          <AdminHeader title="TRANSACTION" />
-          <section className="flex flex-col px-6 pt-6 mt-4 bg-white border-t border-solid border-black border-opacity-30 max-md:pr-5 max-md:max-w-full">
-            <div className="mx-4 max-md:mr-2.5 max-md:max-w-full">
-              <TransactionTable transactions={transactions} />
-            </div>
-            <section className="px-5 pt-5 pb-9 mt-5 bg-white rounded-3xl shadow-sm max-md:max-w-full">
-              <div className="flex gap-5 justify-between max-md:flex-col max-md:gap-0">
-              </div>
-            </section>
-          </section>
-        </header>
-      </main>
-    </div>
   );
 }
 
