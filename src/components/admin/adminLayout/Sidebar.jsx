@@ -1,8 +1,18 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
 import { Button } from "@nextui-org/react";
+import React from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Xóa token từ localStorage
+    localStorage.removeItem("token");
+    localStorage.removeItem("userInfo");
+    
+    navigate("/login");
+  };
+
   return (
     <div className="h-screen bg-gradient-to-b from-pink-200 to-purple-200 flex flex-col items-center py-10 px-8">
       <div className="flex flex-col items-center">
@@ -67,7 +77,7 @@ const Sidebar = () => {
       </div>
       <Button
         className="mt-auto bg-gradient-to-r from-pink-500 to-purple-500 py-3 px-6 rounded-xl text-white font-medium w-full"
-        onClick={() => console.log("Logging out")}
+        onClick={handleLogout} // Gọi hàm handleLogout khi nhấn nút Log out
       >
         Log out
       </Button>

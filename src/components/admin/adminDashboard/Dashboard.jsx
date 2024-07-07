@@ -1,17 +1,17 @@
-import React from "react";
-import AdminHeader from "../adminLayout/AdminHeader";
-import Sidebar from "../adminLayout/Sidebar";
 import {
-  Dropdown,
   Button,
+  Dropdown,
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
 } from "@nextui-org/react";
+import React from "react";
+import AdminHeader from "../adminLayout/AdminHeader";
+import Sidebar from "../adminLayout/Sidebar";
 
 const StatisticCard = ({ color, imageSrc, title, value }) => (
   <div className={`flex flex-col w-full max-md:w-full ${color}`}>
-    <div className="flex flex-col justify-center items-center px-3 py-5 w-full text-xl font-medium tracking-tight text-center whitespace-nowrap bg-green-100 rounded-xl">
+    <div className="flex flex-col justify-center items-center px-4 py-6 w-full text-xl font-semibold tracking-tight text-center bg-white rounded-xl shadow-lg">
       <img
         loading="lazy"
         src={imageSrc}
@@ -19,14 +19,14 @@ const StatisticCard = ({ color, imageSrc, title, value }) => (
         alt={title}
       />
       <div className="mt-3">{title}</div>
-      <div className="mt-4">{value}</div>
+      <div className="mt-4 text-2xl">{value}</div>
     </div>
   </div>
 );
 
 function Dashboard() {
   return (
-    <div className="h-screen bg-white flex">
+    <div className="h-screen bg-white-100 flex">
       {/* sidebar */}
       <Sidebar />
       {/* sidebar */}
@@ -34,41 +34,41 @@ function Dashboard() {
       <main className="flex flex-col w-full overflow-auto">
         <header className="flex flex-col self-stretch my-auto max-md:mt-4 max-md:max-w-full">
           <AdminHeader title="DASHBOARD" />
-          <section className="flex flex-col px-6 pt-6 mt-4 bg-white border-t border-solid border-black border-opacity-30 max-md:pr-5 max-md:max-w-full">
+          <section className="flex flex-col px-6 pt-6 mt-4 bg-white border-t border-solid border-gray-300 max-md:pr-5 max-md:max-w-full">
             <div className="mx-4 max-md:mr-2.5 max-md:max-w-full">
               <section className="grid grid-cols-4 gap-4 max-md:grid-cols-1">
                 <StatisticCard
-                  color="text-sky-400 bg-cyan-200"
+                  color="text-sky-600 bg-cyan-100"
                   imageSrc="https://cdn.builder.io/api/v1/image/assets/TEMP/afbd1a83fa817145ad1d33dfd6e48c6221f43ca578c3fe3157e63472c74d1977?apiKey=402c56a5a1d94d11bd24e7050966bb9d&"
                   title="Revenue"
                   value="70.050.000đ"
                 />
                 <StatisticCard
-                  color="text-red-400 bg-rose-100"
+                  color="text-red-600 bg-rose-100"
                   imageSrc="https://cdn.builder.io/api/v1/image/assets/TEMP/0e5993ab021a0ea5d1cb419afc07bfb9a22b59c5bc9e40501e315ef065482e79?apiKey=402c56a5a1d94d11bd24e7050966bb9d&"
                   title="Transaction"
                   value="75"
                 />
                 <StatisticCard
-                  color="text-teal-400 bg-green-100"
+                  color="text-teal-600 bg-green-100"
                   imageSrc="https://cdn.builder.io/api/v1/image/assets/TEMP/5c06ca009a70d6dcbcbab11a5690b9d8a5e823aff36964cae34c53f4d19926c2?apiKey=402c56a5a1d94d11bd24e7050966bb9d&"
                   title="Categories"
                   value="4"
                 />
                 <StatisticCard
-                  color="bg-zinc-300 text-stone-500"
+                  color="bg-zinc-300 text-stone-600"
                   imageSrc="https://cdn.builder.io/api/v1/image/assets/TEMP/e4db3a152c0f87152095412756cde64a9183a36e35a434939451ce25422b9c47?apiKey=402c56a5a1d94d11bd24e7050966bb9d&"
                   title="Products"
                   value="12"
                 />
               </section>
             </div>
-            <section className="px-5 pt-5 pb-9 mt-5 bg-white rounded-3xl shadow-sm max-md:max-w-full">
+            <section className="px-5 pt-5 pb-9 mt-5 bg-white rounded-3xl shadow-lg max-md:max-w-full">
               <div className="flex gap-5 max-md:flex-col max-md:gap-0">
                 <section className="flex flex-col w-[64%] max-md:ml-0 max-md:w-full">
-                  <div className="flex flex-col grow font-medium tracking-tight text-black max-md:mt-10 max-md:max-w-full">
+                  <div className="flex flex-col grow font-semibold tracking-tight text-black max-md:mt-10 max-md:max-w-full">
                     <h2 className="text-2xl max-md:max-w-full">Revenue</h2>
-                    <p className="mt-6 text-base max-md:max-w-full">OverView</p>
+                    <p className="mt-6 text-base max-md:max-w-full">Overview</p>
                     <div className="flex gap-1 mt-10 max-md:flex-wrap max-md:mt-8 max-md:max-w-full">
                       <div className="flex flex-col items-end self-start text-base whitespace-nowrap">
                         <p className="self-stretch">Millions</p>
@@ -86,7 +86,7 @@ function Dashboard() {
                           alt=""
                         />
                         <div className="flex flex-col grow shrink-0 mt-6 basis-0 w-fit max-md:max-w-full">
-                          <div className="flex flex-col items-start self-end py-3 pr-4 pl-10 mr-20 max-w-full bg-white rounded-xl shadow-sm w-[140px] max-md:pl-5 max-md:mr-2.5">
+                          <div className="flex flex-col items-start self-end py-3 pr-4 pl-10 mr-20 max-w-full bg-white rounded-xl shadow-lg w-[140px] max-md:pl-5 max-md:mr-2.5">
                             <p className="text-sm">December 25</p>
                             <p className="mt-4 text-xs">10.254.000đ</p>
                           </div>
@@ -106,11 +106,11 @@ function Dashboard() {
                   </div>
                 </section>
                 <section className="flex flex-col ml-5 w-[30%] max-md:ml-0 max-md:w-full">
-                  <div className="flex flex-col font-medium tracking-tight text-black max-md:mt-10">
+                  <div className="flex flex-col font-semibold tracking-tight text-black max-md:mt-10">
                     <Dropdown>
                       <DropdownTrigger>
                         <Button
-                          className="self-end px-4 py-3.5 text-medium rounded-xl shadow-sm"
+                          className="self-end px-4 py-3.5 text-medium rounded-xl shadow-lg"
                           style={{
                             backgroundColor: "#e879f9", // Change this color to make the button more visible
                             color: "white", // Text color
@@ -131,40 +131,24 @@ function Dashboard() {
                         <DropdownItem key="sep2023">Sep 2023</DropdownItem>
                       </DropdownMenu>
                     </Dropdown>
-                    <div className="flex flex-col items-start px-5 pt-10 mt-16 w-full text-xl bg-white max-md:pl-5 max-md:mt-10">
-                      <div className="flex items-center gap-2.5 ml-5 max-md:ml-2.5">
-                        <div className="shrink-0 w-3 h-3 bg-black rounded-full font-poiret-one"></div>
-                        <div className="flex-auto">
-                          Total revenue this month
+                    <div className="flex flex-col items-start px-5 pt-10 pb-5 mt-5 bg-white rounded-xl shadow-lg">
+                      <div className="flex items-start w-full justify-between">
+                        <div className="flex flex-col">
+                          <h2 className="text-lg">Sales</h2>
+                          <p className="mt-3 text-xs text-gray-500">
+                            Orders and shipping
+                          </p>
                         </div>
+                        <p className="text-2xl">24</p>
                       </div>
-                      <p className="mt-7 ml-12 max-md:ml-2.5">45.530.000đ</p>
-                      <div className="flex items-center gap-2.5 mt-16 ml-5 max-md:mt-10 max-md:ml-2.5">
-                        <div className="shrink-0 w-3 h-3 bg-black rounded-full font-poiret-one"></div>
-                        <div className="flex-auto">
-                          Quantity’s products sold
+                      <div className="flex items-start w-full justify-between mt-6">
+                        <div className="flex flex-col">
+                          <h2 className="text-lg">Revenue</h2>
+                          <p className="mt-3 text-xs text-gray-500">
+                            Average Revenue
+                          </p>
                         </div>
-                      </div>
-                      <p className="mt-6 ml-12 max-md:ml-2.5">540</p>
-                      <div className="flex gap-5 justify-between self-stretch mt-20 text-2xl text-center text-white whitespace-nowrap max-md:mt-10">
-                        <Button
-                          className="justify-center px-9 py-6 bg-pink-300 rounded-xl max-md:px-5"
-                          style={{
-                            backgroundColor: "#e879f9", // Change this color to make the button more visible
-                            color: "white", // Text color
-                          }}
-                        >
-                          Details
-                        </Button>
-                        <Button
-                          className="justify-center px-9 py-6 bg-pink-300 rounded-xl max-md:px-5"
-                          style={{
-                            backgroundColor: "#e879f9", // Change this color to make the button more visible
-                            color: "white", // Text color
-                          }}
-                        >
-                          Export
-                        </Button>
+                        <p className="text-2xl">70.050.000đ</p>
                       </div>
                     </div>
                   </div>

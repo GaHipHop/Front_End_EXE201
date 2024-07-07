@@ -29,5 +29,6 @@ export {
   getAllCategory,
   getAllCategoryFalse,
   postcreateCategory,
-  updateCategory,
+  updateCategory
 };
+
