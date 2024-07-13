@@ -5,9 +5,6 @@ import Header from "../layout/Header";
 function About() {
   return (
     <div className="flex flex-col bg-white">
-      {/* Header */}
-      <Header />
-
       {/* Main */}
       <div className="relative">
         <img
@@ -41,10 +38,6 @@ function About() {
           </div>
         </div>
       </div>
-      {/* Main */}
-
-      {/* Footer */}
-      <Footer />
     </div>
   );
 }

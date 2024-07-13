@@ -141,7 +141,6 @@ function MainContent() {
 function ProductDetail() {
   return (
     <div className="flex flex-col bg-white">
-      <Header />
       <div className="flex flex-col items-center w-full mt-[5rem]">
         {/* Adjusted margin-top */}
         <MainContent />
@@ -155,7 +154,6 @@ function ProductDetail() {
           Add To Cart
         </Button>
       </div>
-      <Footer />
     </div>
   );
 }
