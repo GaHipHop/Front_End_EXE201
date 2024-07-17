@@ -14,7 +14,7 @@ module.exports = {
         'open-sans': ['"Open Sans"', 'sans-serif'],
         'poetsen-one' : ['"Poetsen One"', 'sans-serif']
       },
-      linearGradientDirections: { // Thêm định nghĩa cho hướng linear gradient
+      linearGradientDirections: {
         t: 'to top',
         tr: 'to top right',
         r: 'to right',
@@ -25,10 +25,24 @@ module.exports = {
         tl: 'to top left',
       },
       colors: {
-        'custom-purple': '#EDAFDB', // Mã màu tùy chỉnh
+        'custom-purple': '#EDAFDB',
+      },
+      keyframes: {
+        blink: {
+          '0%, 100%': { backgroundColor: 'red' },
+          '14%': { backgroundColor: 'orange' },
+          '28%': { backgroundColor: 'yellow' },
+          '42%': { backgroundColor: 'green' },
+          '57%': { backgroundColor: 'blue' },
+          '71%': { backgroundColor: 'indigo' },
+          '85%': { backgroundColor: 'violet' },
+        },
+      },
+      animation: {
+        blink: 'blink 2s infinite',
       },
     },
   },
   darkMode: "class",
   plugins: [nextui(), require('@tailwindcss/aspect-ratio')],
-}
+};
