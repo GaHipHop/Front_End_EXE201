@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faFacebook,
@@ -6,6 +6,7 @@ import {
   faTiktok,
 } from "@fortawesome/free-brands-svg-icons";
 import { faEnvelope, faPhone } from "@fortawesome/free-solid-svg-icons";
+import { getAllContacts } from "../../lib/service/contactService";
 function PolicyList() {
   const policies = [
     { name: "About products", link: "#" },
@@ -30,6 +31,25 @@ function PolicyList() {
 }
 
 function Contact() {
+  const [contact, setContact] = useState(null);
+
+  useEffect(() => {
+    const fetchContacts = async () => {
+      try {
+        const response = await getAllContacts();
+        if (response.data && response.data.data.length > 0) {
+          setContact(response.data.data[0]);
+        }
+      } catch (error) {
+        console.error("Error fetching contacts:", error);
+      }
+    };
+
+    fetchContacts();
+  }, []);
+
+  if (!contact) return <p>Loading contact information...</p>;
+
   return (
     <div className="md:mr-4">
       <h2 className="text-xl font-plus-jakarta mb-2">Contact</h2>
@@ -38,8 +58,8 @@ function Contact() {
           icon={faEnvelope}
           style={{ width: "20px", height: "20px", marginRight: "10px" }}
         />
-        <a href="mailto:phatdao@gmail.com" className="hover:underline">
-          phatdao@gmail.com
+        <a href={`mailto:${contact.email}`} className="hover:underline">
+          {contact.email}
         </a>
       </p>
       <p className="text-gray-600 flex items-center font-open-sans">
@@ -47,8 +67,8 @@ function Contact() {
           icon={faPhone}
           style={{ width: "20px", height: "20px", marginRight: "10px" }}
         />
-        <a href="tel:0922xxxxxxxx" className="hover:underline">
-          0922xxxxxxxx
+        <a href={`tel:${contact.phone}`} className="hover:underline">
+          {contact.phone}
         </a>
       </p>
     </div>
@@ -56,11 +76,30 @@ function Contact() {
 }
 
 function EcommerceSocial() {
+  const [contact, setContact] = useState(null);
+
+  useEffect(() => {
+    const fetchContacts = async () => {
+      try {
+        const response = await getAllContacts();
+        if (response.data && response.data.data.length > 0) {
+          setContact(response.data.data[0]);
+        }
+      } catch (error) {
+        console.error("Error fetching contacts:", error);
+      }
+    };
+
+    fetchContacts();
+  }, []);
+
+  if (!contact) return <p>Loading social links...</p>;
+
   return (
     <div className="md:mr-4">
       <h2 className="text-xl font-plus-jakarta mb-2">Ecommerce</h2>
       <div className="flex space-x-5">
-        <a href="https://shopee.vn" target="_blank" rel="noopener noreferrer">
+        <a href={contact.shoppee} target="_blank" rel="noopener noreferrer">
           <img
             src="/src/assets/image/icons8-shopee-50.png"
             alt="shopee"
@@ -70,31 +109,19 @@ function EcommerceSocial() {
       </div>
       <h2 className="text-xl font-plus-jakarta mb-2 mt-px">Social</h2>
       <div className="flex space-x-5">
-        <a
-          href="https://www.facebook.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <a href={contact.facebook} target="_blank" rel="noopener noreferrer">
           <FontAwesomeIcon
             icon={faFacebook}
             style={{ width: "20px", height: "20px" }}
           />
         </a>
-        <a
-          href="https://www.instagram.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <a href={contact.instagram} target="_blank" rel="noopener noreferrer">
           <FontAwesomeIcon
             icon={faInstagram}
             style={{ width: "20px", height: "20px" }}
           />
         </a>
-        <a
-          href="https://www.tiktok.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <a href={contact.tiktok} target="_blank" rel="noopener noreferrer">
           <FontAwesomeIcon
             icon={faTiktok}
             style={{ width: "20px", height: "20px" }}
