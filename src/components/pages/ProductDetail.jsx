@@ -1,8 +1,11 @@
-import React from "react";
-import Header from "../layout/Header";
-import Footer from "../layout/Footer";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { Button } from "@nextui-org/react";
+import { GetKindById } from '../../lib/service/kindService';
+import { GetProductById } from '../../lib/service/productService';
+import Header from "../layout/Header";
+import Footer from "../layout/Footer";
 
 function PolicySection() {
   return (
@@ -87,64 +90,124 @@ function EcommerceSection() {
   );
 }
 
-function MainContent() {
+function KindList({ kinds, onKindClick }) {
+  return (
+    <div className="flex flex-wrap gap-4">
+      {kinds.map((kind, index) => (
+        <div key={index} className="w-[calc(20%-10px)] flex flex-col items-center" onClick={() => onKindClick(kind.id)}>
+          <img src={kind.image} alt={kind.colorName} className="w-[50%] h-auto" />
+          <p>{kind.colorName}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function MainContent({ productId }) {
+  const [kind, setKind] = useState(null);
+  const [product, setProduct] = useState(null);
+  const [kinds, setKinds] = useState([]);
+
+  useEffect(() => {
+    const fetchProductAndKinds = async () => {
+      try {
+        const productResponse = await GetProductById(productId);
+        const productData = productResponse.data.data;
+        setProduct(productData);
+
+        const kindsData = productData.kinds;
+        setKinds(kindsData);
+
+        if (kindsData.length > 0) {
+          const kindResponse = await GetKindById(kindsData[0].id);
+          setKind(kindResponse.data.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch product or kinds:', error);
+      }
+    };
+
+    fetchProductAndKinds();
+  }, [productId]);
+
+  const handleKindClick = async (kindId) => {
+    try {
+      const kindResponse = await GetKindById(kindId);
+      setKind(kindResponse.data.data);
+    } catch (error) {
+      console.error('Failed to fetch kind:', error);
+    }
+  };
+
   return (
     <main className="px-10 py-4 w-full bg-white border-t border-black border-solid max-md:px-5 max-md:max-w-full">
-      <div className="flex gap-3 max-md:flex-col max-md:gap-0">
-        <div className="flex flex-col w-[40%] max-md:w-full mx-auto">
-          <div className="flex flex-col grow max-md:mt-8">
-            <Link to="/product" className="hover:underline mt-8">
-              <img
-                loading="lazy"
-                src="https://cdn.builder.io/api/v1/image/assets/TEMP/4da31893cf6b60f515d90fcf502cdffa8eceb14b82bd89a7d1b0ec445f066ff2?apiKey=2d591b1c79224a4881e4a85e4f46aa1b&"
-                alt="icon"
-                className="aspect-[1.35] w-[30px]"
-              />
-            </Link>
-            <div
-              className="flex flex-col justify-center mt-10 bg-white border border-black border-solid rounded-[20px] max-md:mt-8 mx-auto"
-              style={{ width: "250px" }} // chỉnh thông số kích thước hình
-            >
-              <img
-                loading="lazy"
-                src="https://cdn.builder.io/api/v1/image/assets/TEMP/17a0a0baf75932fe539061729da14d51570dfa47ae02214ea4ccd1bc89a6460c?apiKey=2d591b1c79224a4881e4a85e4f46aa1b&"
-                alt="Decorative item"
-                className="w-full aspect-[0.8]"
-                style={{ width: "100%", height: "auto" }} // Adjusted width and height
-              />
+      {kind && (
+        <div className="flex gap-3 max-md:flex-col max-md:gap-0">
+          <div className="flex flex-col w-[40%] max-md:w-full mx-auto">
+            <div className="flex flex-col grow max-md:mt-8">
+              <Link to="/product" className="hover:underline mt-8">
+                <img
+                  loading="lazy"
+                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/4da31893cf6b60f515d90fcf502cdffa8eceb14b82bd89a7d1b0ec445f066ff2?apiKey=2d591b1c79224a4881e4a85e4f46aa1b&"
+                  alt="icon"
+                  className="aspect-[1.35] w-[30px]"
+                />
+              </Link>
+              <div
+                className="flex flex-col justify-center mt-10 bg-white rounded-[20px] max-md:mt-8 mx-auto"
+                style={{ width: "200px", height: "200px" }} // chỉnh thông số kích thước hình
+              >
+                <img
+                  loading="lazy"
+                  src={kind.image}
+                  alt={kind.colorName}
+                  className="w-full aspect-[0.8]"
+                  style={{ width: "100%", height: "auto" }} // Adjusted width and height
+                />
+              </div>
+              <p className="mt-4 text-center text-base font-medium">{kind.colorName}</p>
+              <p className="mt-1 text-center text-base">Quantity: {kind.quantity}</p>
             </div>
           </div>
+          <section className="flex flex-col ml-3 w-[70%] max-md:ml-0 max-md:w-full">
+            {product && (
+              <div className="flex flex-col mt-16 text-xl tracking-tight text-black max-md:mt-8">
+                <h3 className="leading-8 font-semibold">{product.productName}</h3>
+                <p className="mt-2">Category: {product.category.categoryName}</p>
+                <p className="mt-5">
+                  Price: {product.currentPrice !== product.productPrice ? (
+                    <>
+                      <span className="line-through">{product.productPrice}đ</span> <span className="font-bold">{product.currentPrice}đ</span>
+                    </>
+                  ) : (
+                    <span className="font-bold">{product.productPrice}đ</span>
+                  )}
+                </p>
+                <p className="mt-1">Discount: {product.discount.percent}%</p>
+                <p className="mt-1">Discount Expiry: {new Date(product.discount.expiredDate).toLocaleDateString()}</p>
+                <p className="mt-1">Stock Quantity: {product.stockQuantity}</p>
+                <p className="pt-6 pb-2 mt-10 whitespace-nowrap border-b border-black border-solid max-md:mt-8">
+                  Description
+                </p>
+                <p className="mt-4 text-base leading-6">{product.productDescription}</p>
+              </div>
+            )}
+            {kinds.length > 0 && <KindList kinds={kinds} onKindClick={handleKindClick} />}
+          </section>
         </div>
-        <section className="flex flex-col ml-3 w-[70%] max-md:ml-0 max-md:w-full">
-          <article className="flex flex-col mt-16 text-xl tracking-tight text-black max-md:mt-8">
-            <h3 className="leading-8 font-semibold">
-              Handmade self-dried clay flowers as graduation gifts, very meaningful November 20th gifts - Cheap handmade clay flowers
-            </h3>
-            <p className="mt-5">Price: 50,000 - 80,000đ</p>
-            <p className="pt-6 pb-2 mt-10 whitespace-nowrap border-b border-black border-solid max-md:mt-8">
-              Description
-            </p>
-            <p className="mt-4 text-base leading-6">
-              Handmade self-dried clay flowers are a great choice as graduation gifts or November 20th gifts, bringing special meaning and value to the recipient. These flowers are created entirely by hand, from self-dried clay, by Ga Hiphop shop.
-              <br />
-              <br />
-              Self-dried clay flowers are not only beautiful and graceful, but also show the care and dedication of the maker. Each flower is created by hand, with each petal and small detail carefully sculpted and shaped. This creates a unique product with high aesthetic value.
-              <br />
-            </p>
-          </article>
-        </section>
-      </div>
+      )}
     </main>
   );
 }
 
 function ProductDetail() {
+  const { productId } = useParams();
+
   return (
     <div className="flex flex-col bg-white">
       <Header />
       <div className="flex flex-col items-center w-full mt-[5rem]">
-        {/* Adjusted margin-top */}
-        <MainContent />
+        <MainContent productId={productId} />
         <Button
           className="mt-4 px-6 py-2 mb-5 text-medium rounded-xl shadow-sm"
           style={{

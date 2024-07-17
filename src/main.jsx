@@ -22,7 +22,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/admin/dashboard" element={<Dashboard />} />
         <Route path="/admin/transaction" element={<Transaction />} />
         <Route path="/product" element={<Product />} />
-        <Route path="/productDetail" element={<ProductDetail />} />
+        <Route path="/productDetail/:productId" element={<ProductDetail />} />
         
         {/* <Route path="/admin/products" element={<AdminProduct />} /> */}
         {/* <Route path="/admin/categories" element={<AdminCategory />} /> */}
