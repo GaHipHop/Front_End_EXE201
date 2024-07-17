@@ -15,12 +15,36 @@ const GetKindById = async (id) => {
   return await axios.get(`Kind/GetKindById/${id}`);
 };
 
-const postcreateKind = async (data) => {
-  return await axios.post(`Kind/CreateKind`, data);
+const postcreateKind = async (data, token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'multipart/form-data',
+    },
+  };
+  try {
+    const response = await axios.post(`Kind/CreateKind`, data, config);
+    return response;
+  } catch (error) {
+    console.error("Error creating kind:", error.response ? error.response.data : error.message);
+    throw error;
+  }
 };
 
-const updateKind = async (id, data) => {
-  return await axios.patch(`Kind/UpdateKind/${id}`, data);
+const updateKind = async (id, data, token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'multipart/form-data',
+    },
+  };
+  try {
+    const response = await axios.patch(`Kind/UpdateKind/${id}`, data, config);
+    return response;
+  } catch (error) {
+    console.error("Error creating kind:", error.response ? error.response.data : error.message);
+    throw error;
+  }
 };
 
 const deleteKind = async (id) => {
@@ -28,11 +52,9 @@ const deleteKind = async (id) => {
 };
 
 export {
-  getAllKind,
-  getAllKindFalse,
   GetAllKindByProductId,
-  GetKindById,
-  postcreateKind,
-  updateKind,
-  deleteKind,
+  GetKindById, deleteKind, getAllKind,
+  getAllKindFalse, postcreateKind,
+  updateKind
 };
+

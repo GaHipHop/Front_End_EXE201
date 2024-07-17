@@ -96,7 +96,34 @@ const updateStatusOrderConfirmed = async (orderId, token) => {
   try {
     console.log(`Sending request to confirm order with ID: ${orderId}`);
     console.log(`Token: ${token}`);
-    const response = await axios.patch(`Order/updateStatusOrderConfirmed/${orderId}`, config);
+    const response = await axios.patch(`Order/updateStatusOrderConfirmed/${orderId}`, {}, config);
+    console.log('Response from server:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error in updateStatusOrderConfirmed:', error);
+    if (error.response) {
+      console.error('Error response data:', error.response.data);
+      console.error('Error response status:', error.response.status);
+      console.error('Error response headers:', error.response.headers);
+    } else if (error.request) {
+      console.error('No response received:', error.request);
+    } else {
+      console.error('Error message:', error.message);
+    }
+    throw error;
+  }
+};
+
+const updateStatusOrderReject = async (orderId, token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  try {
+    console.log(`Sending request to confirm order with ID: ${orderId}`);
+    console.log(`Token: ${token}`);
+    const response = await axios.patch(`Order/updateStatusOrderReject/${orderId}`, {}, config);
     console.log('Response from server:', response.data);
     return response.data;
   } catch (error) {
@@ -119,6 +146,7 @@ export {
   getOrdersByStatusConfirmed,
   getOrdersByStatusPending,
   getOrdersByStatusRejected,
-  updateStatusOrderConfirmed
+  updateStatusOrderConfirmed,
+  updateStatusOrderReject
 };
 
