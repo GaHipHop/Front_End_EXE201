@@ -2,10 +2,8 @@ import React from "react";
 import "react-toastify/dist/ReactToastify.css";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import AdminCategory from "./components/admin/adminDashboard/AdminCategory";
 import AdminDiscount from "./components/admin/adminDashboard/AdminDiscount";
 import AdminManage from "./components/admin/adminDashboard/AdminManage";
-import AdminProduct from "./components/admin/adminDashboard/AdminProduct";
 import Contact from "./components/admin/adminDashboard/Contact";
 import Dashboard from "./components/admin/adminDashboard/Dashboard";
 import ProductList from "./components/admin/adminDashboard/ProductList";
@@ -13,14 +11,14 @@ import Transaction from "./components/admin/adminDashboard/Transaction";
 import UpdateProduct from "./components/admin/adminDashboard/UpdateProduct";
 import About from "./components/pages/About";
 import Home from "./components/pages/Home";
-// import AdminProduct from "./components/admin/adminDashboard/AdminProduct"
-// import AdminCategory from "./components/admin/adminDashboard/AdminCategory"
+import AdminCategory from "./components/admin/adminDashboard/AdminCategory"
 import Login from "./components/pages/Login";
 import Product from "./components/pages/Product";
 import ProductDetail from "./components/pages/ProductDetail";
 import "./index.css";
 import Layout from "./components/layout/Layout";
 import { NotFound } from "./components/pages/NotFound/NotFound";
+import AdminProduct from "./components/admin/adminDashboard/AdminProduct";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

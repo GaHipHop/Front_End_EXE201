@@ -9,30 +9,9 @@ import { postcreateProduct } from "../../../lib/service/productService";
 import AdminHeader from "../adminLayout/AdminHeader";
 import Sidebar from "../adminLayout/Sidebar";
 
-// Định nghĩa kiểu dữ liệu cho danh mục và discount
-interface Category {
-  id: number;
-  categoryName: string;
-}
-
-interface Discount {
-  id: number;
-  percent: number;
-  expiredDate: string;
-  status: boolean;
-}
-
-interface Errors {
-  ProductName?: string;
-  CategoryId?: string;
-  DiscountId?: string;
-  ProductPrice?: string;
-  ProductDescription?: string;
-}
-
 function AddProductForm() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [discounts, setDiscounts] = useState<Discount[]>([]);
+  const [categories, setCategories] = useState([]);
+  const [discounts, setDiscounts] = useState([]);
   const [product, setProduct] = useState({
     name: "",
     categoryId: "",
@@ -40,10 +19,8 @@ function AddProductForm() {
     price: "",
     description: ""
   });
-  const [kinds, setKinds] = useState([
-    { colorName: "", quantity: "", file: null }
-  ]);
-  const [errors, setErrors] = useState<Errors>({});
+  const [kinds, setKinds] = useState([{ colorName: "", quantity: "", file: null }]);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -137,6 +114,7 @@ function AddProductForm() {
 
   return (
     <>
+      <AdminHeader />
       <ToastContainer />
       <section className="flex flex-col items-start text-base font-medium tracking-tight text-center text-black max-md:flex-wrap max-md:pr-5">
         <div className="flex flex-col justify-between w-full px-2.5 py-2.5 bg-white">
@@ -247,7 +225,7 @@ function AddProductForm() {
                   />
                 </div>
                 <div className="flex items-center mb-2">
-                  <label htmlFor={`file-${index}`} className="w-1/4 text-left">File</label>
+                  <label htmlFor={`file-${index}`} className="w-1/4 text-left">Image</label>
                   <input
                     id={`file-${index}`}
                     name="file"
@@ -256,14 +234,12 @@ function AddProductForm() {
                     onChange={(e) => handleKindChange(index, e)}
                   />
                 </div>
-                <div className="flex justify-between w-full mt-2">
-                  <Button onClick={() => removeKind(index)} className="bg-red-600 text-white" size="sm">Remove</Button>
-                  <Button onClick={addKind} className="bg-green-600 text-white" size="sm">Add Kind</Button>
-                </div>
+                <button type="button" onClick={() => removeKind(index)} className="text-red-500">Remove Kind</button>
               </div>
             ))}
-            <div className="flex justify-center w-full py-2.5 bg-white">
-              <Button type="submit" className="text-white bg-pink-400 border-2 border-solid border-white rounded-2xl">Add</Button>
+            <Button onClick={addKind}>Add Kind</Button>
+            <div className="flex justify-center py-2.5 bg-white">
+              <Button type="submit">Save</Button>
             </div>
           </form>
         </div>
