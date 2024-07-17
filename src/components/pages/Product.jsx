@@ -99,7 +99,6 @@ const Product = () => {
     <div className="flex flex-col bg-white">
       <Header onCategorySelect={handleCategorySelect} />
       <MainContent products={products} />
-      <Footer />
     </div>
   );
 };

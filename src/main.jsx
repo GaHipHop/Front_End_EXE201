@@ -1,4 +1,5 @@
 import React from "react";
+import "react-toastify/dist/ReactToastify.css";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import AdminCategory from "./components/admin/adminDashboard/AdminCategory";
@@ -18,8 +19,10 @@ import Login from "./components/pages/Login";
 import Product from "./components/pages/Product";
 import ProductDetail from "./components/pages/ProductDetail";
 import "./index.css";
+import Layout from "./components/layout/Layout";
+import { NotFound } from "./components/pages/NotFound/NotFound";
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
       <Routes>
@@ -31,6 +34,22 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/product" element={<Product />} />
         <Route path="/productDetail/:productId" element={<ProductDetail />} />
         
+        {/* Layout cho trang thường */}
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="home" element={<Home />} />
+          <Route path="about" element={<About />} />
+          <Route path="login" element={<Login />} />
+          <Route path="product" element={<Product />} />
+          <Route path="productDetail/:productId" element={<ProductDetail />} />
+
+          <Route path="*" element={<NotFound />} />
+        </Route>
+
+        <Route path="admin/dashboard" element={<Dashboard />} />
+        <Route path="admin/transaction" element={<Transaction />} />
+
+        {/* <Route path="/admin/products" element={<AdminProduct />} /> */}
         <Route path="/admin/manageProducts" element={<ProductList />} />
         <Route path="/admin/createProducts" element={<AdminProduct />} />
         <Route path="/admin/updateProducts" element={<UpdateProduct />} />
