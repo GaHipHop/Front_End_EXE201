@@ -2,7 +2,13 @@ import React from "react";
 import "react-toastify/dist/ReactToastify.css";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import AdminCategory from "./components/admin/adminDashboard/AdminCategory";
+import AdminDiscount from "./components/admin/adminDashboard/AdminDiscount";
+import AdminManage from "./components/admin/adminDashboard/AdminManage";
+import AdminProduct from "./components/admin/adminDashboard/AdminProduct";
+import Contact from "./components/admin/adminDashboard/Contact";
 import Dashboard from "./components/admin/adminDashboard/Dashboard";
+import ProductList from "./components/admin/adminDashboard/ProductList";
 import Transaction from "./components/admin/adminDashboard/Transaction";
 import About from "./components/pages/About";
 import Home from "./components/pages/Home";
@@ -35,6 +41,12 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="admin/transaction" element={<Transaction />} />
 
         {/* <Route path="/admin/products" element={<AdminProduct />} /> */}
+        <Route path="/admin/manageProducts" element={<ProductList />} />
+        <Route path="/admin/products" element={<AdminProduct />} />
+        <Route path="/admin/category" element={<AdminCategory />} />
+        <Route path="/admin/discount" element={<AdminDiscount />} />
+        <Route path="/admin/manageAdmin" element={<AdminManage />} />
+        <Route path="/admin/contact" element={<Contact />} />
         {/* <Route path="/admin/categories" element={<AdminCategory />} /> */}
       </Routes>
     </BrowserRouter>

@@ -4,62 +4,68 @@ import UpdateIcon from '@mui/icons-material/Update';
 import React, { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { deleteCategory, getAllCategory, getAllCategoryFalse, GetCategoryById, postcreateCategory, updateCategory } from "../../../lib/service/categoryService";
+import { deletetDiscount, getAllDiscount, getAllDiscountFalse, GetDiscountBy, postcreateDiscount, updateDiscount } from "../../../lib/service/discountService";
 import AdminHeader from "../adminLayout/AdminHeader";
 import Sidebar from "../adminLayout/Sidebar";
 
-function AdminCategory() {
-  const [categories, setCategories] = useState([]);
-  const [filteredCategory, setFilteredCategory] = useState([]);
+function AdminDiscount() {
+  const [discounts, setDiscounts] = useState([]);
+  const [filteredDiscount, setFilteredDiscount] = useState([]);
   const [dropdownVisible, setDropdownVisible] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedDiscount, setSelectedDiscount] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
-  const [newCategoryName, setNewCategoryName] = useState("");
+  const [newDiscountPercent, setNewDiscountPercent] = useState("");
+  const [newDiscountExpiredDate, setNewDiscountExpiredDate] = useState("");
   const [currentFilter, setCurrentFilter] = useState('true');
 
-  const fetchCategories = async (filter) => {
+  const fetchDiscounts = async (filter) => {
     const token = localStorage.getItem('token');
     try {
       let response;
       if (filter === 'true') {
-        response = await getAllCategory();
+        response = await getAllDiscount();
       } else {
-        response = await getAllCategoryFalse(token);
+        response = await getAllDiscountFalse(token);
       }
-      setCategories(response.data.data.result || []);
-      setFilteredCategory(response.data.data.result);
+      setDiscounts(response.data.data || []);
+      setFilteredDiscount(response.data.data);
     } catch (error) {
-      console.error("Error fetching categories:", error);
-      setCategories([]);
-      toast.error("Error fetching categories: " + error.message);
+      console.error("Error fetching discounts:", error);
+      setDiscounts([]);
+      toast.error("Error fetching discounts: " + error.message);
     }
   };
 
   useEffect(() => {
-    fetchCategories(currentFilter);
+    fetchDiscounts(currentFilter);
   }, [currentFilter]);
 
   const handleSearch = (event) => {
     const searchTerm = event.target.value.toLowerCase();
-    const filtered = categories.filter(category =>
-      category.categoryName.toLowerCase().includes(searchTerm)
+    const filtered = discounts.filter(discount =>
+      discount.percent.toString().includes(searchTerm) ||
+      new Date(discount.expiredDate).toLocaleDateString().toLowerCase().includes(searchTerm)
     );
-    setFilteredCategory(filtered);
+    setFilteredDiscount(filtered);
   };
 
-  const handleUpdate = async (categoryId) => {
+  const handleUpdate = async (discountId) => {
     try {
-      const response = await GetCategoryById(categoryId);
-      setSelectedCategory(response.data.data);
+      const token = localStorage.getItem('token');
+      const response = await GetDiscountBy(discountId, token);
+      const discountData = response.data.data;
+      // Định dạng ngày trước khi đặt vào state
+      discountData.expiredDate = new Date(discountData.expiredDate).toISOString().split('T')[0];
+      setSelectedDiscount(discountData);
       setShowPopup(true);
     } catch (error) {
-      console.error("Error fetching category details:", error);
-      toast.error("Error fetching category details: " + error.message);
+      console.error("Error fetching discount details:", error);
+      toast.error("Error fetching discount details: " + error.message);
     }
   };
 
-  const handleDelete = async (categoryId) => {
+  const handleDelete = async (discountId) => {
     const token = localStorage.getItem('token');
     if (!token) {
       console.error("No token found in local storage.");
@@ -68,18 +74,18 @@ function AdminCategory() {
     }
 
     try {
-      await deleteCategory(categoryId, token);
-      fetchCategories(currentFilter);
-      toast.success("Category deleted successfully.");
+      await deletetDiscount(discountId, token);
+      fetchDiscounts(currentFilter);
+      toast.success("Discount deleted successfully.");
     } catch (error) {
-      console.error("Error deleting category:", error);
-      toast.error("Error deleting category: " + error.message);
+      console.error("Error deleting discount:", error);
+      toast.error("Error deleting discount: " + error.message);
     }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setSelectedCategory((prev) => ({
+    setSelectedDiscount((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -93,23 +99,23 @@ function AdminCategory() {
       return;
     }
 
-    if (!selectedCategory.id || !selectedCategory.categoryName) {
-      console.error("Missing required fields in selectedCategory:", selectedCategory);
-      toast.error("Missing required fields in selectedCategory.");
+    if (!selectedDiscount.id || !selectedDiscount.percent || !selectedDiscount.expiredDate) {
+      console.error("Missing required fields in selectedDiscount:", selectedDiscount);
+      toast.error("Missing required fields in selectedDiscount.");
       return;
     }
 
     try {
-      await updateCategory(selectedCategory.id, selectedCategory, token);
+      await updateDiscount(selectedDiscount.id, selectedDiscount, token);
       setShowPopup(false);
-      fetchCategories(currentFilter);
-      toast.success("Category updated successfully.");
+      fetchDiscounts(currentFilter);
+      toast.success("Discount updated successfully.");
     } catch (error) {
-      console.error("Error updating category:", error);
+      console.error("Error updating discount:", error);
       if (error.response) {
-        toast.error("Error updating category: " + error.response.data.message);
+        toast.error("Error updating discount: " + error.response.data.message);
       } else {
-        toast.error("Error updating category: " + error.message);
+        toast.error("Error updating discount: " + error.message);
       }
     }
   };
@@ -122,24 +128,26 @@ function AdminCategory() {
       return;
     }
 
-    if (!newCategoryName) {
-      console.error("Category name is required.");
-      toast.error("Category name is required.");
+    if (!newDiscountPercent || !newDiscountExpiredDate) {
+      console.error("Percent and expired date are required.");
+      toast.error("Percent and expired date are required.");
       return;
     }
 
-    const newCategory = {
-      categoryName: newCategoryName,
+    const newDiscount = {
+      percent: newDiscountPercent,
+      expiredDate: newDiscountExpiredDate,
+      status: currentFilter === 'true'
     };
 
     try {
-      await postcreateCategory(newCategory, token);
+      await postcreateDiscount(newDiscount, token);
       setShowPopup(false);
-      fetchCategories(currentFilter);
-      toast.success("Category created successfully.");
+      fetchDiscounts(currentFilter);
+      toast.success("Discount created successfully.");
     } catch (error) {
-      console.error("Error creating category:", error);
-      toast.error(error.response.data.message);
+      console.error("Error creating discount:", error);
+      toast.error("Error creating discount: " + error.message);
     }
   };
 
@@ -150,16 +158,17 @@ function AdminCategory() {
 
   const closePopup = () => {
     setShowPopup(false);
-    setSelectedCategory(null);
+    setSelectedDiscount(null);
     setIsCreating(false);
-    setNewCategoryName("");
+    setNewDiscountPercent("");
+    setNewDiscountExpiredDate("");
   };
 
   const handleFilterChange = (filter) => {
     setCurrentFilter(filter);
   };
 
-  function CategoryTable({ categories }) {
+  function DiscountTable({ discounts }) {
     return (
       <section className="flex flex-col items-start text-base font-medium tracking-tight text-center text-black max-md:flex-wrap max-md:pr-5">
         <div className="flex justify-between w-full px-2.5 py-2.5 bg-white">
@@ -167,16 +176,19 @@ function AdminCategory() {
             <span>No</span>
           </div>
           <div className="flex-1 flex justify-center items-center">
-            <span>Categories ID</span>
+            <span>Discount ID</span>
           </div>
           <div className="flex-1 flex justify-center items-center">
-            <span>Category Name</span>
+            <span>Percent</span>
+          </div>
+          <div className="flex-1 flex justify-center items-center">
+            <span>Expired Date</span>
           </div>
           <div className="flex-1 flex justify-center items-center">
             <span>Action</span>
           </div>
         </div>
-        {categories.map((category, index) => (
+        {discounts.map((discount, index) => (
           <div
             key={index}
             className="relative flex justify-between w-full px-2.5 py-2.5 text-base tracking-tight text-black bg-white max-md:flex-wrap"
@@ -185,10 +197,13 @@ function AdminCategory() {
               {index + 1}
             </div>
             <div className="flex-1 flex justify-center items-center text-center font-plus-jakarta break-words">
-              {category.id}
+              {discount.id}
             </div>
             <div className="flex-1 flex justify-center items-center text-center font-plus-jakarta break-words">
-              <span>{category.categoryName}</span>
+              <span>{discount.percent}%</span>
+            </div>
+            <div className="flex-1 flex justify-center items-center text-center font-plus-jakarta break-words">
+              <span>{new Date(discount.expiredDate).toLocaleDateString()}</span>
             </div>
             <div className="flex-1 flex justify-center items-center text-center font-plus-jakarta break-words relative">
               <span onClick={() => setDropdownVisible(index)}>...</span>
@@ -202,10 +217,10 @@ function AdminCategory() {
                   }}
                 >
                   <ul>
-                    <li className="p-2 cursor-pointer flex items-center" onClick={() => handleUpdate(category.id)}>
+                    <li className="p-2 cursor-pointer flex items-center" onClick={() => handleUpdate(discount.id)}>
                       <UpdateIcon className="mr-2" /> Update
                     </li>
-                    <li className="p-2 cursor-pointer flex items-center" onClick={() => handleDelete(category.id)}>
+                    <li className="p-2 cursor-pointer flex items-center" onClick={() => handleDelete(discount.id)}>
                       <DeleteIcon className="mr-2" /> Delete
                     </li>
                   </ul>
@@ -223,7 +238,7 @@ function AdminCategory() {
       <Sidebar />
       <main className="flex flex-col w-full overflow-auto">
         <header className="admin-header">
-          <AdminHeader title="Manage Categories" />
+          <AdminHeader title="Manage Discounts" />
         </header>
         <style>
           {`
@@ -269,26 +284,38 @@ function AdminCategory() {
             >
               <CreateIcon className="mr-2" /> Create
             </button>
-            <CategoryTable categories={filteredCategory} />
+            <DiscountTable discounts={filteredDiscount} />
           </div>
         </section>
         {showPopup && (
           <div className="fixed inset-0 flex items-center justify-center z-50">
             <div className="absolute inset-0 bg-black opacity-50"></div>
             <div className="bg-white p-6 rounded-md shadow-lg z-10">
-              <h2 className="text-xl font-bold mb-4">{isCreating ? "Create Category" : "Category Details"}</h2>
+              <h2 className="text-xl font-bold mb-4">{isCreating ? "Create Discount" : "Discount Details"}</h2>
               <form>
                 {isCreating ? (
                   <>
                     <div className="mb-4">
                       <label className="block text-gray-700 text-sm font-bold mb-2">
-                        Category Name
+                        Percent
                       </label>
                       <input
-                        type="text"
-                        name="newCategoryName"
-                        value={newCategoryName}
-                        onChange={(e) => setNewCategoryName(e.target.value)}
+                        type="number"
+                        name="newDiscountPercent"
+                        value={newDiscountPercent}
+                        onChange={(e) => setNewDiscountPercent(e.target.value)}
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-gray-700 text-sm font-bold mb-2">
+                        Expired Date
+                      </label>
+                      <input
+                        type="date"
+                        name="newDiscountExpiredDate"
+                        value={newDiscountExpiredDate}
+                        onChange={(e) => setNewDiscountExpiredDate(e.target.value)}
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       />
                     </div>
@@ -318,19 +345,31 @@ function AdminCategory() {
                       <input
                         type="text"
                         name="id"
-                        value={selectedCategory.id}
+                        value={selectedDiscount.id}
                         readOnly
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       />
                     </div>
                     <div className="mb-4">
                       <label className="block text-gray-700 text-sm font-bold mb-2">
-                        Name
+                        Percent
                       </label>
                       <input
-                        type="text"
-                        name="categoryName"
-                        value={selectedCategory.categoryName}
+                        type="number"
+                        name="percent"
+                        value={selectedDiscount.percent}
+                        onChange={handleChange}
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-gray-700 text-sm font-bold mb-2">
+                        Expired Date
+                      </label>
+                      <input
+                        type="date"
+                        name="expiredDate"
+                        value={selectedDiscount.expiredDate}
                         onChange={handleChange}
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       />
@@ -341,7 +380,7 @@ function AdminCategory() {
                       </label>
                       <select
                         name="status"
-                        value={selectedCategory.status}
+                        value={selectedDiscount.status}
                         onChange={handleChange}
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       >
@@ -377,4 +416,4 @@ function AdminCategory() {
   );
 }
 
-export default AdminCategory;
+export default AdminDiscount;

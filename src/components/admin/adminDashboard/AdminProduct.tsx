@@ -1,9 +1,55 @@
-import React from "react";
-import Sidebar from "../adminLayout/Sidebar";
-import AdminHeader from "../adminLayout/AdminHeader";
 import { Button } from "@nextui-org/react";
+import React, { useEffect, useState } from "react";
+import { getAllCategory } from "../../../lib/service/categoryService"; // Điều chỉnh đường dẫn này nếu cần
+import { getAllDiscount } from "../../../lib/service/discountService";
+import AdminHeader from "../adminLayout/AdminHeader";
+import Sidebar from "../adminLayout/Sidebar";
+
+// Định nghĩa kiểu dữ liệu cho danh mục và discount
+interface Category {
+  id: number;
+  categoryName: string;
+}
+
+interface Discount {
+  id: number;
+  percent: number;
+  expiredDate: string;
+  status: boolean;
+}
 
 function AddProductForm() {
+  // Sử dụng kiểu dữ liệu cho state
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [discounts, setDiscounts] = useState<Discount[]>([]); // Thêm state cho discount
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await getAllCategory(); // Thay đổi đường dẫn API nếu cần
+        const categories = response.data?.data.result ?? [];
+        setCategories(categories);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        setCategories([]);
+      }
+    };
+
+    const fetchDiscounts = async () => {
+      try {
+        const response = await getAllDiscount(); // Gọi API lấy danh sách discount
+        const discounts = response.data.data ?? [];
+        setDiscounts(discounts);
+      } catch (error) {
+        console.error("Error fetching discounts:", error);
+        setDiscounts([]);
+      }
+    };
+
+    fetchCategories();
+    fetchDiscounts();
+  }, []);
+
   return (
     <section className="flex flex-col items-start text-base font-medium tracking-tight text-center text-black max-md:flex-wrap max-md:pr-5">
       <div className="flex flex-col justify-between w-full px-2.5 py-2.5 bg-white">
@@ -18,17 +64,18 @@ function AddProductForm() {
           <div className="flex-1 flex flex-col items-start px-2.5">
             <label htmlFor="category" className="mb-2">Category</label>
             <select id="category" className="w-full p-2 border rounded">
-              <option value="category1">Categories</option>
-              <option value="category2">Category 1</option>
-              <option value="category3">Category 2</option>
+              {categories.map(category => (
+                <option key={category.id} value={category.id}>{category.categoryName}</option>
+              ))}
             </select>
           </div>
           <div className="flex-1 flex flex-col items-start px-2.5">
-            <label htmlFor="image" className="mb-2">Image</label>
-            <div className="w-full flex">
-              <input type="file" id="image" className="w-full p-2 border rounded" />
-              <img src="https://firebasestorage.googleapis.com/v0/b/artworks-sharing-platform.appspot.com/o/images%2F1.image.png?alt=media&token=3c77475f-90df-4f19-879e-c8024ae789bb" alt="Sample" className="w-16 h-16 ml-4" />
-            </div>
+            <label htmlFor="discount" className="mb-2">Discount</label>
+            <select id="discount" className="w-full p-2 border rounded">
+              {discounts.map(discount => (
+                <option key={discount.id} value={discount.id}>{`Discount ${discount.percent}% - Expires on ${discount.expiredDate}`}</option>
+              ))}
+            </select>
           </div>
         </div>
         <div className="flex justify-between w-full px-2.5 py-2.5 bg-white">

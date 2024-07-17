@@ -3,26 +3,53 @@ const getAllDiscount = async () => {
   return await axios.get(`Discount/GetAllDiscount`);
 };
 
-const GetDiscountBy = async (id) => {
-  return await axios.get(`Discount/GetDiscountBy/${id}`);
+const getAllDiscountFalse = async (token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  return await axios.get(`Discount/GetAllDiscountFalse`, config);
 };
 
-const postcreateDiscount = async (data) => {
-  return await axios.post(`Discount/CreateDiscount`, data);
+const GetDiscountBy = async (id, token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  return await axios.get(`Discount/GetDiscountBy/${id}`, config);
 };
 
-const updateDiscount = async (id, data) => {
-  return await axios.patch(`Discount/UpdateDiscount/${id}`, data);
+const postcreateDiscount = async (data, token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  return await axios.post(`Discount/CreateDiscount`, data, config);
 };
 
-const deletetDiscount = async (id) => {
-  return await axios.delete(`Discount/DeleteDiscount/${id}`);
+const updateDiscount = async (id, data, token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  return await axios.patch(`Discount/UpdateDiscount/${id}`, data, config);
+};
+
+const deletetDiscount = async (id, token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  return await axios.delete(`Discount/DeleteDiscount/${id}`, config);
 };
 
 export {
-  getAllDiscount,
-  GetDiscountBy,
-  postcreateDiscount,
-  updateDiscount,
-  deletetDiscount,
+  GetDiscountBy, deletetDiscount, getAllDiscount, getAllDiscountFalse, postcreateDiscount,
+  updateDiscount
 };
+

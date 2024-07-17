@@ -1,6 +1,11 @@
 import axios from "../axiosCustomize";
-const getAllAdminByStatusTrue = async () => {
-  return await axios.get(`Admin/getAllAdminByStatusTrue`);
+const getAllAdminByStatusTrue = async (token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  return await axios.get(`Admin/getAllAdminByStatusTrue`, config);
 };
 
 const getAllAdminByStatusFalse = async (token) => {
@@ -21,12 +26,22 @@ const getAdminById = async (id, token) => {
   return await axios.get(`Admin/getAdminById/${id}`, config);
 };
 
-const postcreateAdmin = async (data) => {
-  return await axios.post(`Admin/createAdmin`, data);
+const postcreateAdmin = async (data, token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  return await axios.post(`Admin/createAdmin`, data, config);
 };
 
-const updateAdmin = async (id, data) => {
-  return await axios.patch(`Admin/updateAdmin/${id}`, data);
+const updateAdmin = async (id, data, token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  return await axios.patch(`Admin/updateAdmin/${id}`, data, config);
 };
 
 const deletetAdmin = async (id, token) => {
@@ -35,7 +50,7 @@ const deletetAdmin = async (id, token) => {
       Authorization: `Bearer ${token}`,
     },
   };
-  return await axios.delete(`Admin/deleteAdmin/${id}`, config);
+  return await axios.delete(`Admin/deletetAdmin/${id}`, config);
 };
 
 export { deletetAdmin, getAdminById, getAllAdminByStatusFalse, getAllAdminByStatusTrue, postcreateAdmin, updateAdmin };
