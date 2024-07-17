@@ -26,14 +26,6 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/admin/dashboard" element={<Dashboard />} />
-        <Route path="/admin/transaction" element={<Transaction />} />
-        <Route path="/product" element={<Product />} />
-        <Route path="/productDetail/:productId" element={<ProductDetail />} />
-        
         {/* Layout cho trang thường */}
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
