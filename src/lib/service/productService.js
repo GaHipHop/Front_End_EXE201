@@ -3,8 +3,13 @@ const getAllProduct = async () => {
   return await axios.get(`Product/GetAllProduct`);
 };
 
-const getAllAdminByStatusFalse = async () => {
-  return await axios.get(`Product/GetAllProductFalse`);
+const getAllAdminByStatusFalse = async (token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  return await axios.get(`Product/GetAllProductFalse`, config);
 };
 
 const getAllProductByCategoryId = async (id) => {
@@ -28,11 +33,7 @@ const deletetProduct = async (id) => {
 };
 
 export {
-  getAllProduct,
-  getAllAdminByStatusFalse,
-  getAllProductByCategoryId,
-  GetProductById,
-  postcreateProduct,
-  updateProduct,
-  deletetProduct,
+  GetProductById, deletetProduct, getAllAdminByStatusFalse, getAllProduct, getAllProductByCategoryId, postcreateProduct,
+  updateProduct
 };
+
