@@ -1,7 +1,11 @@
 import { Button } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
-import { getAllCategory } from "../../../lib/service/categoryService"; // Điều chỉnh đường dẫn này nếu cần
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { getAllCategory } from "../../../lib/service/categoryService";
 import { getAllDiscount } from "../../../lib/service/discountService";
+import { postcreateKind } from "../../../lib/service/kindService";
+import { postcreateProduct } from "../../../lib/service/productService";
 import AdminHeader from "../adminLayout/AdminHeader";
 import Sidebar from "../adminLayout/Sidebar";
 
@@ -18,30 +22,48 @@ interface Discount {
   status: boolean;
 }
 
+interface Errors {
+  ProductName?: string;
+  CategoryId?: string;
+  DiscountId?: string;
+  ProductPrice?: string;
+  ProductDescription?: string;
+}
+
 function AddProductForm() {
-  // Sử dụng kiểu dữ liệu cho state
   const [categories, setCategories] = useState<Category[]>([]);
-  const [discounts, setDiscounts] = useState<Discount[]>([]); // Thêm state cho discount
+  const [discounts, setDiscounts] = useState<Discount[]>([]);
+  const [product, setProduct] = useState({
+    name: "",
+    categoryId: "",
+    discountId: "",
+    price: "",
+    description: ""
+  });
+  const [kinds, setKinds] = useState([
+    { colorName: "", quantity: "", file: null }
+  ]);
+  const [errors, setErrors] = useState<Errors>({});
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await getAllCategory(); // Thay đổi đường dẫn API nếu cần
+        const response = await getAllCategory();
         const categories = response.data?.data.result ?? [];
         setCategories(categories);
       } catch (error) {
-        console.error("Error fetching categories:", error);
+        toast.error("Error fetching categories");
         setCategories([]);
       }
     };
 
     const fetchDiscounts = async () => {
       try {
-        const response = await getAllDiscount(); // Gọi API lấy danh sách discount
+        const response = await getAllDiscount();
         const discounts = response.data.data ?? [];
         setDiscounts(discounts);
       } catch (error) {
-        console.error("Error fetching discounts:", error);
+        toast.error("Error fetching discounts");
         setDiscounts([]);
       }
     };
@@ -50,56 +72,203 @@ function AddProductForm() {
     fetchDiscounts();
   }, []);
 
+  const handleProductChange = (e) => {
+    const { name, value } = e.target;
+    setProduct({
+      ...product,
+      [name]: value
+    });
+  };
+
+  const handleKindChange = (index, e) => {
+    const { name, value, files } = e.target;
+    const updatedKinds = kinds.map((kind, i) => 
+      i === index ? { ...kind, [name]: files ? files[0] : value } : kind
+    );
+    setKinds(updatedKinds);
+  };
+
+  const addKind = () => {
+    setKinds([...kinds, { colorName: "", quantity: "", file: null }]);
+  };
+
+  const removeKind = (index) => {
+    setKinds(kinds.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async (e) => {
+    const token = localStorage.getItem('token');
+    e.preventDefault();
+    try {
+      const productData = new FormData();
+      productData.append("ProductName", product.name);
+      productData.append("CategoryId", product.categoryId);
+      productData.append("DiscountId", product.discountId);
+      productData.append("ProductPrice", product.price);
+      productData.append("ProductDescription", product.description);
+
+      // Create Product
+      const productResponse = await postcreateProduct(productData, token);
+      const productId = productResponse.data.data.id;
+
+      // Create Kinds
+      for (let kind of kinds) {
+        const kindData = new FormData();
+        kindData.append("ProductId", productId);
+        kindData.append("ColorName", kind.colorName);
+        kindData.append("Quantity", kind.quantity);
+        if (kind.file) {
+          kindData.append("File", kind.file);
+        }
+        await postcreateKind(kindData, token);
+      }
+
+      toast.success("Product and kinds created successfully");
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.errors) {
+        setErrors(error.response.data.errors);
+        toast.error("Error creating product or kinds");
+      } else {
+        toast.error("An unexpected error occurred");
+        console.error("Error creating product or kinds:", error);
+      }
+    }
+  };
+
   return (
-    <section className="flex flex-col items-start text-base font-medium tracking-tight text-center text-black max-md:flex-wrap max-md:pr-5">
-      <div className="flex flex-col justify-between w-full px-2.5 py-2.5 bg-white">
-        <h2 className="text-left text-pink-500 mb-4">Add</h2>
-        <div className="flex justify-between w-full px-2.5 py-2.5 bg-white">
-          <div className="flex-1 flex flex-col items-start px-2.5">
-            <label htmlFor="name" className="mb-2">Name</label>
-            <input id="name" type="text" className="w-full p-2 border rounded" placeholder="Name" />
-          </div>
+    <>
+      <ToastContainer />
+      <section className="flex flex-col items-start text-base font-medium tracking-tight text-center text-black max-md:flex-wrap max-md:pr-5">
+        <div className="flex flex-col justify-between w-full px-2.5 py-2.5 bg-white">
+          <h2 className="text-left text-pink-500 mb-4">Add Product</h2>
+          <form onSubmit={handleSubmit}>
+            <div className="flex flex-col px-2.5 py-2.5 bg-white">
+              <div className="flex items-center mb-2">
+                <label htmlFor="name" className="w-1/4 text-left">Name</label>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  className="w-2/4 p-2 border rounded"
+                  placeholder="Name"
+                  value={product.name}
+                  onChange={handleProductChange}
+                />
+              </div>
+              {errors.ProductName && <p className="text-red-500">{errors.ProductName}</p>}
+            </div>
+            <div className="flex flex-col px-2.5 py-2.5 bg-white">
+              <div className="flex items-center mb-2">
+                <label htmlFor="category" className="w-1/4 text-left">Category</label>
+                <select
+                  id="category"
+                  name="categoryId"
+                  className="w-2/4 p-2 border rounded"
+                  value={product.categoryId}
+                  onChange={handleProductChange}
+                >
+                  {categories.map(category => (
+                    <option key={category.id} value={category.id}>{category.categoryName}</option>
+                  ))}
+                </select>
+              </div>
+              {errors.CategoryId && <p className="text-red-500">{errors.CategoryId}</p>}
+            </div>
+            <div className="flex flex-col px-2.5 py-2.5 bg-white">
+              <div className="flex items-center mb-2">
+                <label htmlFor="discount" className="w-1/4 text-left">Discount</label>
+                <select
+                  id="discount"
+                  name="discountId"
+                  className="w-2/4 p-2 border rounded"
+                  value={product.discountId}
+                  onChange={handleProductChange}
+                >
+                  {discounts.map(discount => (
+                    <option key={discount.id} value={discount.id}>{`Discount ${discount.percent}% - Expires on ${discount.expiredDate}`}</option>
+                  ))}
+                </select>
+              </div>
+              {errors.DiscountId && <p className="text-red-500">{errors.DiscountId}</p>}
+            </div>
+            <div className="flex flex-col px-2.5 py-2.5 bg-white">
+              <div className="flex items-center mb-2">
+                <label htmlFor="price" className="w-1/4 text-left">Price</label>
+                <input
+                  id="price"
+                  name="price"
+                  type="text"
+                  className="w-2/4 p-2 border rounded"
+                  placeholder="1,2,3,..."
+                  value={product.price}
+                  onChange={handleProductChange}
+                />
+              </div>
+              {errors.ProductPrice && <p className="text-red-500">{errors.ProductPrice}</p>}
+            </div>
+            <div className="flex flex-col px-2.5 py-2.5 bg-white">
+              <div className="flex items-center mb-2">
+                <label htmlFor="description" className="w-1/4 text-left">Description</label>
+                <textarea
+                  id="description"
+                  name="description"
+                  className="w-2/4 p-2 border rounded"
+                  placeholder="1,2,3,..."
+                  value={product.description}
+                  onChange={handleProductChange}
+                ></textarea>
+              </div>
+              {errors.ProductDescription && <p className="text-red-500">{errors.ProductDescription}</p>}
+            </div>
+            <h2 className="text-left text-pink-500 mb-4">Add Kinds</h2>
+            {kinds.map((kind, index) => (
+              <div key={index} className="flex flex-col px-2.5 py-2.5 bg-white">
+                <div className="flex items-center mb-2">
+                  <label htmlFor={`colorName-${index}`} className="w-1/4 text-left">Color Name</label>
+                  <input
+                    id={`colorName-${index}`}
+                    name="colorName"
+                    type="color"
+                    className="w-2/4 p-2 border rounded"
+                    value={kind.colorName}
+                    onChange={(e) => handleKindChange(index, e)}
+                  />
+                </div>
+                <div className="flex items-center mb-2">
+                  <label htmlFor={`quantity-${index}`} className="w-1/4 text-left">Quantity</label>
+                  <input
+                    id={`quantity-${index}`}
+                    name="quantity"
+                    type="text"
+                    className="w-2/4 p-2 border rounded"
+                    placeholder="1,2,3,..."
+                    value={kind.quantity}
+                    onChange={(e) => handleKindChange(index, e)}
+                  />
+                </div>
+                <div className="flex items-center mb-2">
+                  <label htmlFor={`file-${index}`} className="w-1/4 text-left">File</label>
+                  <input
+                    id={`file-${index}`}
+                    name="file"
+                    type="file"
+                    className="w-2/4 p-2 border rounded"
+                    onChange={(e) => handleKindChange(index, e)}
+                  />
+                </div>
+                <div className="flex justify-between w-full mt-2">
+                  <Button onClick={() => removeKind(index)} className="bg-red-600 text-white" size="sm">Remove</Button>
+                  <Button onClick={addKind} className="bg-green-600 text-white" size="sm">Add Kind</Button>
+                </div>
+              </div>
+            ))}
+            <div className="flex justify-center w-full py-2.5 bg-white">
+              <Button type="submit" className="text-white bg-pink-400 border-2 border-solid border-white rounded-2xl">Add</Button>
+            </div>
+          </form>
         </div>
-        <div className="flex justify-between w-full px-2.5 py-2.5 bg-white">
-          <div className="flex-1 flex flex-col items-start px-2.5">
-            <label htmlFor="category" className="mb-2">Category</label>
-            <select id="category" className="w-full p-2 border rounded">
-              {categories.map(category => (
-                <option key={category.id} value={category.id}>{category.categoryName}</option>
-              ))}
-            </select>
-          </div>
-          <div className="flex-1 flex flex-col items-start px-2.5">
-            <label htmlFor="discount" className="mb-2">Discount</label>
-            <select id="discount" className="w-full p-2 border rounded">
-              {discounts.map(discount => (
-                <option key={discount.id} value={discount.id}>{`Discount ${discount.percent}% - Expires on ${discount.expiredDate}`}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-        <div className="flex justify-between w-full px-2.5 py-2.5 bg-white">
-          <div className="flex-1 flex flex-col items-start px-2.5">
-            <label htmlFor="price" className="mb-2">Price</label>
-            <input id="price" type="text" className="w-full p-2 border rounded" placeholder="1,2,3,..." />
-          </div>
-          <div className="flex-1 flex flex-col items-start px-2.5">
-            <label htmlFor="quantity" className="mb-2">Quantity</label>
-            <input id="quantity" type="text" className="w-full p-2 border rounded" placeholder="1,2,3,..." />
-          </div>
-        </div>
-        <div className="flex justify-between w-full px-2.5 py-2.5 bg-white">
-          <div className="flex-1 flex flex-col items-start px-2.5">
-            <label htmlFor="description" className="mb-2">Description</label>
-            <textarea id="description" className="w-full p-2 border rounded" placeholder="1,2,3,..."></textarea>
-          </div>
-        </div>
-        <div className="flex justify-center w-full py-2.5 bg-white">
-          <Button className="text-white bg-red-600 border-2 border-solid border-white rounded-2xl">Back</Button>
-          <Button className="text-white bg-pink-400 border-2 border-solid border-white rounded-2xl">Add</Button>
-        </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }
 

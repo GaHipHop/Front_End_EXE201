@@ -1,16 +1,18 @@
-import { Category, ChevronLeft, ChevronRight, ContactSupport, Home, List, Logout, ShoppingCart } from "@mui/icons-material";
+import { Category, ChevronLeft, ChevronRight, ContactSupport, Home, List, LocalOffer, Logout, ShoppingCart, SupervisorAccount } from "@mui/icons-material";
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+
+  console.log(userInfo.roleId)
 
   const handleLogout = () => {
-    // Xóa token từ localStorage
+    // Xóa token và thông tin người dùng từ localStorage
     localStorage.removeItem("token");
     localStorage.removeItem("userInfo");
-    
     navigate("/login");
   };
 
@@ -95,35 +97,39 @@ const Sidebar = () => {
             } ${isCollapsed ? 'justify-center' : 'px-6'}`
           }
         >
-          <Category />
+          <LocalOffer  />
           {!isCollapsed && <span className="ml-4">Discount</span>}
         </NavLink>
-        <NavLink
-          to="/admin/manageAdmin"
-          className={({ isActive }) =>
-            `flex items-center py-3 rounded-xl font-medium font-plus-jakarta w-full text-left transition duration-300 ease-in-out ${
-              isActive
-                ? "bg-pink-300 text-white"
-                : "bg-white text-black hover:bg-pink-300 hover:text-white"
-            } ${isCollapsed ? 'justify-center' : 'px-6'}`
-          }
-        >
-          <Category />
-          {!isCollapsed && <span className="ml-4">Admin</span>}
-        </NavLink>
-        <NavLink
-          to="/admin/contact"
-          className={({ isActive }) =>
-            `flex items-center py-3 rounded-xl font-medium font-plus-jakarta w-full text-left transition duration-300 ease-in-out ${
-              isActive
-                ? "bg-pink-300 text-white"
-                : "bg-white text-black hover:bg-pink-300 hover:text-white"
-            } ${isCollapsed ? 'justify-center' : 'px-6'}`
-          }
-        >
-          <ContactSupport />
-          {!isCollapsed && <span className="ml-4">Contact</span>}
-        </NavLink>
+        {userInfo.roleId == 2 && (
+          <>
+            <NavLink
+              to="/admin/manageAdmin"
+              className={({ isActive }) =>
+                `flex items-center py-3 rounded-xl font-medium font-plus-jakarta w-full text-left transition duration-300 ease-in-out ${
+                  isActive
+                    ? "bg-pink-300 text-white"
+                    : "bg-white text-black hover:bg-pink-300 hover:text-white"
+                } ${isCollapsed ? 'justify-center' : 'px-6'}`
+              }
+            >
+              <SupervisorAccount />
+              {!isCollapsed && <span className="ml-4">Admin</span>}
+            </NavLink>
+            <NavLink
+              to="/admin/contact"
+              className={({ isActive }) =>
+                `flex items-center py-3 rounded-xl font-medium font-plus-jakarta w-full text-left transition duration-300 ease-in-out ${
+                  isActive
+                    ? "bg-pink-300 text-white"
+                    : "bg-white text-black hover:bg-pink-300 hover:text-white"
+                } ${isCollapsed ? 'justify-center' : 'px-6'}`
+              }
+            >
+              <ContactSupport />
+              {!isCollapsed && <span className="ml-4">Contact</span>}
+            </NavLink>
+          </>
+        )}
       </div>
       <NavLink
         to="/login"

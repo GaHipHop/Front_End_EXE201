@@ -248,7 +248,6 @@ function AdminDiscount() {
               padding: 8px 16px;
               border-radius: 8px;
               text-transform: uppercase;
-              font-weight: bold;
               cursor: pointer;
             }
 
@@ -278,7 +277,7 @@ function AdminDiscount() {
           </div>
           <div className="mx-4 max-md:mr-2.5 max-md:max-w-full mt-4">
             <button
-              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              className="custom-button"
               onClick={openCreatePopup}
               style={{ marginBottom: '16px' }}
             >
@@ -322,14 +321,14 @@ function AdminDiscount() {
                     <div className="flex items-center justify-between">
                       <button
                         type="button"
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        className="custom-button"
                         onClick={handleCreate}
                       >
                         Create
                       </button>
                       <button
                         type="button"
-                        className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        className="custom-button"
                         onClick={closePopup}
                       >
                         Cancel
@@ -391,14 +390,14 @@ function AdminDiscount() {
                     <div className="flex items-center justify-between">
                       <button
                         type="button"
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        className="custom-button"
                         onClick={handleSave}
                       >
                         Save
                       </button>
                       <button
                         type="button"
-                        className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        className="custom-button"
                         onClick={closePopup}
                       >
                         Cancel

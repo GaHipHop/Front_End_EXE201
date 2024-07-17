@@ -20,16 +20,46 @@ const GetProductById = async (id) => {
   return await axios.get(`Product/GetProductById/${id}`);
 };
 
-const postcreateProduct = async (data) => {
-  return await axios.post(`Product/CreateProduct`, data);
+const postcreateProduct = async (data, token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'multipart/form-data',
+    },
+  };
+  try {
+    const response = await axios.post(`Product/CreateProduct`, data, config);
+    return response;
+  } catch (error) {
+    console.error("Error creating product:", error.response.data); // In ra lỗi chi tiết từ server
+    throw error;
+  }
 };
 
-const updateProduct = async (id, data) => {
-  return await axios.patch(`Product/UpdateProduct/${id}`, data);
+const updateProduct = async (id, data, token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json', // Set the content type to JSON
+    },
+  };
+  try {
+    const response = await axios.patch(`Product/UpdateProduct/${id}`, data, config);
+    return response;
+  } catch (error) {
+    console.error("Error updating product:", error.response ? error.response.data : error.message);
+    throw error;
+  }
 };
 
-const deletetProduct = async (id) => {
-  return await axios.delete(`Product/DeleteProduct/${id}`);
+
+const deletetProduct = async (id, token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  return await axios.delete(`Product/DeleteProduct/${id}`, config);
 };
 
 export {

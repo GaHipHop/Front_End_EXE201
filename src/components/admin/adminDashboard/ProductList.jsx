@@ -1,11 +1,13 @@
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
 import InfoIcon from '@mui/icons-material/Info';
-import UpdateIcon from '@mui/icons-material/Update'; // Thêm biểu tượng Update
+import UpdateIcon from '@mui/icons-material/Update';
 import { Box, Button, Modal, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAllAdminByStatusFalse, getAllProduct, GetProductById } from "../../../lib/service/productService";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { deletetProduct, getAllAdminByStatusFalse, getAllProduct, GetProductById } from "../../../lib/service/productService";
 import AdminHeader from "../adminLayout/AdminHeader";
 import Sidebar from "../adminLayout/Sidebar";
 
@@ -15,29 +17,26 @@ function ProductList() {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
-  const [currentFilter, setCurrentFilter] = useState('true'); // Default filter to 'true'
+  const [currentFilter, setCurrentFilter] = useState('true');
   const navigate = useNavigate();
 
   const fetchProducts = async (filter) => {
     try {
       const token = localStorage.getItem('token');
-      
       let response;
       if (filter === 'true') {
         response = await getAllProduct();
       } else {
         response = await getAllAdminByStatusFalse(token);
       }
-      setProducts(response.data.data.result || []); // đảm bảo response.data là một mảng, nếu không thì gán một mảng rỗng
+      setProducts(response.data.data.result || []);
       setFilteredProduct(response.data.data.result);
-      console.log(response.data);
     } catch (error) {
       console.error("Error fetching products:", error);
-      setProducts([]); // Xử lý lỗi nếu cần thiết
+      setProducts([]);
     }
   };
 
-  // Fetch products on component mount
   useEffect(() => {
     fetchProducts(currentFilter);
   }, [currentFilter]);
@@ -57,20 +56,31 @@ function ProductList() {
 
   const handleAction = async (action) => {
     if (!selectedProduct) return;
+    const token = localStorage.getItem('token');
     if (action === 'Detail') {
-      const token = localStorage.getItem('token');
       const config = {
         headers: { Authorization: `Bearer ${token}` }
       };
       const response = await GetProductById(selectedProduct.id, config);
       setSelectedProduct(response.data.data);
-      console.log(response.data.data);
       setDetailModalOpen(true);
     } else if (action === 'Update') {
-      // Xử lý hành động cập nhật
-      console.log('Update action triggered for product:', selectedProduct.id);
+      const config = {
+        headers: { Authorization: `Bearer ${token}` }
+      };
+      const response = await GetProductById(selectedProduct.id, config);
+      const productToUpdate = response.data.data;
+      navigate('/admin/updateProducts', { state: { product: productToUpdate } });
+    } else if (action === 'Delete') {
+      try {
+        await deletetProduct(selectedProduct.id, token);
+        toast.success("Product deleted successfully");
+        fetchProducts(currentFilter);
+      } catch (error) {
+        toast.error("Error deleting product");
+        console.error("Error deleting product:", error);
+      }
     }
-    // Đóng dropdown sau khi chọn hành động
     setDropdownVisible(false);
   };
 
@@ -83,14 +93,12 @@ function ProductList() {
   };
 
   const handleCreate = () => {
-    // Thực hiện hành động tạo mới sản phẩm
-    navigate('/admin/products');
-    console.log('Create new product');
+    navigate('/admin/createProducts');
   };
 
   function ProductTable({ products }) {
     if (!Array.isArray(products)) {
-      return null; // hoặc hiển thị thông báo lỗi
+      return null;
     }
 
     return (
@@ -306,6 +314,7 @@ function ProductList() {
         <header className="admin-header">
           <AdminHeader title="Manage Product" />
         </header>
+        <ToastContainer />
         <style>
           {`
             .custom-button {
@@ -314,7 +323,6 @@ function ProductList() {
              padding: 8px 16px;
              border-radius: 8px;
              text-transform: uppercase;
-             font-weight: bold;
              cursor: pointer;
             } 
 
@@ -345,11 +353,10 @@ function ProductList() {
           </div>
           <div className="mx-4 max-md:mr-2.5 max-md:max-w-full">
             <Button
-              variant="contained"
-              color="primary"
+              className="custom-button"
               onClick={handleCreate}
               startIcon={<CreateIcon />}
-              style={{ marginBottom: '16px' }} // Thêm khoảng cách giữa nút Create và bảng
+              style={{ marginBottom: '16px', marginTop: '25px' }}
             >
               Create
             </Button>
