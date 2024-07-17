@@ -21,7 +21,7 @@
     "@mui/material": "^5.16.0",
     "@nextui-org/dropdown": "^2.1.25",
     "@nextui-org/navbar": "^2.0.32",
-    "@nextui-org/react": "^2.4.1",
+    "@nextui-org/react": "^2.4.2",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "axios": "^1.7.2",
     "clsx": "^2.1.1",

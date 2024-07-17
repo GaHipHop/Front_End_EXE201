@@ -1,7 +1,7 @@
 import React from "react";
-import "react-toastify/dist/ReactToastify.css";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import "react-toastify/dist/ReactToastify.css";
 import AdminCategory from "./components/admin/adminDashboard/AdminCategory";
 import AdminDiscount from "./components/admin/adminDashboard/AdminDiscount";
 import AdminManage from "./components/admin/adminDashboard/AdminManage";
@@ -15,12 +15,14 @@ import About from "./components/pages/About";
 import Home from "./components/pages/Home";
 // import AdminProduct from "./components/admin/adminDashboard/AdminProduct"
 // import AdminCategory from "./components/admin/adminDashboard/AdminCategory"
+import Layout from "./components/layout/Layout";
+import Checkout from './components/pages/Checkout';
 import Login from "./components/pages/Login";
+import { NotFound } from "./components/pages/NotFound/NotFound";
 import Product from "./components/pages/Product";
 import ProductDetail from "./components/pages/ProductDetail";
+import SuccessPage from './components/pages/SuccessPage';
 import "./index.css";
-import Layout from "./components/layout/Layout";
-import { NotFound } from "./components/pages/NotFound/NotFound";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -34,6 +36,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <Route path="login" element={<Login />} />
           <Route path="product" element={<Product />} />
           <Route path="productDetail/:productId" element={<ProductDetail />} />
+          <Route path="checkout" element={<Checkout />} />
+          <Route path="/success" element={<SuccessPage />} />
 
           <Route path="*" element={<NotFound />} />
         </Route>

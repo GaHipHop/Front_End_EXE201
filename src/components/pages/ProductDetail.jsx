@@ -1,94 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { Link } from "react-router-dom";
 import { Button } from "@nextui-org/react";
+import { useEffect, useState } from 'react';
+import { Link, useParams } from "react-router-dom";
+import { postCart } from '../../lib/service/cartService'; // Import dịch vụ giỏ hàng
 import { GetKindById } from '../../lib/service/kindService';
 import { GetProductById } from '../../lib/service/productService';
-import Header from "../layout/Header";
 import Footer from "../layout/Footer";
-
-function PolicySection() {
-  return (
-    <section className="flex flex-col gap-4 text-base tracking-tight text-black">
-      <p className="text-2xl font-medium">Policy</p>
-      <p>About products</p>
-      <p>Private Policy</p>
-      <p>Delivery policy</p>
-    </section>
-  );
-}
-
-function ContactSection() {
-  return (
-    <section className="flex flex-col text-2xl font-medium tracking-tight text-black whitespace-nowrap">
-      <p className="text-center">Contact</p>
-      <p className="z-10 mt-0 text-center">Contact</p>
-      <div className="flex gap-2.5 mt-2 text-base">
-        <img
-          loading="lazy"
-          src="https://cdn.builder.io/api/v1/image/assets/TEMP/6fb0a2d47c1e9d57bc77903c2cd0291a14234d323f75a2d5e9bd2839bee05f06?apiKey=2d591b1c79224a4881e4a85e4f46aa1b&"
-          alt=""
-          className="shrink-0 aspect-[0.97] w-[33px]"
-        />
-        <div className="flex flex-col my-auto">
-          <p>phatdao@gmail.com</p>
-          <p className="z-10 -mt-3">phatdao@gmail.com</p>
-        </div>
-      </div>
-      <div className="flex gap-3 mt-1 text-base">
-        <img
-          loading="lazy"
-          src="https://cdn.builder.io/api/v1/image/assets/TEMP/8cd09e5c8398ef144202e0051bed64ea0d338eca63947859f35094b7c1fae125?apiKey=2d591b1c79224a4881e4a85e4f46aa1b&"
-          alt=""
-          className="shrink-0 aspect-[0.97] w-[33px]"
-        />
-        <p className="flex-auto my-auto">0922xxxxxxxx</p>
-      </div>
-    </section>
-  );
-}
-
-function EcommerceSection() {
-  return (
-    <section className="flex flex-col mt-1.5">
-      <p className="text-2xl font-medium tracking-tight text-center text-black">
-        Ecommerce
-      </p>
-      <img
-        loading="lazy"
-        src="https://cdn.builder.io/api/v1/image/assets/TEMP/f0881c1c1385bbcfe1b605704848c84ce989e9079ced1066ba7ed8a7d8dcf23a?apiKey=2d591b1c79224a4881e4a85e4f46aa1b&"
-        alt=""
-        className="mt-2 w-9 aspect-[1.06]"
-      />
-      <p className="mt-6 text-2xl font-medium tracking-tight text-center text-black">
-        Social
-      </p>
-      <p className="z-10 mt-0 text-2xl font-medium tracking-tight text-center text-black">
-        Social
-      </p>
-      <div className="flex gap-3 mt-3.5">
-        <img
-          loading="lazy"
-          src="https://cdn.builder.io/api/v1/image/assets/TEMP/fae79f1daca40f01d4dc22e9f25048611434028bfeccc40477acc77dd57e5059?apiKey=2d591b1c79224a4881e4a85e4f46aa1b&"
-          alt=""
-          className="shrink-0 w-9 aspect-[1.06]"
-        />
-        <img
-          loading="lazy"
-          src="https://cdn.builder.io/api/v1/image/assets/TEMP/157c2e91e65cd9cc09d27d0419cf0def2b33283291ee35e8a3f52e865e8bed1d?apiKey=2d591b1c79224a4881e4a85e4f46aa1b&"
-          alt=""
-          className="shrink-0 aspect-[1.09] w-[37px]"
-        />
-        <img
-          loading="lazy"
-          src="https://cdn.builder.io/api/v1/image/assets/TEMP/c34d741ce2cca8203f3f5b91b34fb4ffbcfc527f812b205157606d0efa765dc6?apiKey=2d591b1c79224a4881e4a85e4f46aa1b&"
-          alt=""
-          className="shrink-0 aspect-[1.12] w-[38px]"
-        />
-      </div>
-    </section>
-  );
-}
+import Header from "../layout/Header";
 
 function KindList({ kinds, onKindClick }) {
   return (
@@ -103,10 +20,42 @@ function KindList({ kinds, onKindClick }) {
   );
 }
 
-function MainContent({ productId }) {
+const QuantitySelector = ({ initialQuantity = 1, onQuantityChange }) => {
+  const [quantity, setQuantity] = useState(initialQuantity);
+
+  const handleDecrease = () => {
+    if (quantity > 1) {
+      const newQuantity = quantity - 1;
+      setQuantity(newQuantity);
+      onQuantityChange(newQuantity);
+    }
+  };
+
+  const handleIncrease = () => {
+    const newQuantity = quantity + 1;
+    setQuantity(newQuantity);
+    onQuantityChange(newQuantity);
+  };
+
+  return (
+    <div className="flex items-center">
+      <Button auto light onClick={handleDecrease}>-</Button>
+      <input 
+        type="text" 
+        value={quantity} 
+        readOnly 
+        className="w-12 text-center mx-2 border border-gray-300 rounded" 
+      />
+      <Button auto light onClick={handleIncrease}>+</Button>
+    </div>
+  );
+};
+
+function MainContent({ productId, onAddToCart, setKindId }) {
   const [kind, setKind] = useState(null);
   const [product, setProduct] = useState(null);
   const [kinds, setKinds] = useState([]);
+  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     const fetchProductAndKinds = async () => {
@@ -121,6 +70,7 @@ function MainContent({ productId }) {
         if (kindsData.length > 0) {
           const kindResponse = await GetKindById(kindsData[0].id);
           setKind(kindResponse.data.data);
+          setKindId(kindsData[0].id); // Lấy kindId đầu tiên
         }
       } catch (error) {
         console.error('Failed to fetch product or kinds:', error);
@@ -128,12 +78,13 @@ function MainContent({ productId }) {
     };
 
     fetchProductAndKinds();
-  }, [productId]);
+  }, [productId, setKindId]);
 
   const handleKindClick = async (kindId) => {
     try {
       const kindResponse = await GetKindById(kindId);
       setKind(kindResponse.data.data);
+      setKindId(kindId); // Cập nhật kindId khi người dùng chọn loại khác
     } catch (error) {
       console.error('Failed to fetch kind:', error);
     }
@@ -183,9 +134,9 @@ function MainContent({ productId }) {
                     <span className="font-bold">{product.productPrice}đ</span>
                   )}
                 </p>
-                <p className="mt-1">Discount: {product.discount.percent}%</p>
-                <p className="mt-1">Discount Expiry: {new Date(product.discount.expiredDate).toLocaleDateString()}</p>
-                <p className="mt-1">Stock Quantity: {product.stockQuantity}</p>
+                <p className="mt-1">Discount: {product.discount.percent}% - until {new Date(product.discount.expiredDate).toLocaleDateString()}</p>
+                <p className="mt-1">Color: {kind.colorName}</p>
+                <p className="mt-1">Quantity: {kind.quantity}</p>
                 <p className="pt-6 pb-2 mt-10 whitespace-nowrap border-b border-black border-solid max-md:mt-8">
                   Description
                 </p>
@@ -193,6 +144,9 @@ function MainContent({ productId }) {
               </div>
             )}
             {kinds.length > 0 && <KindList kinds={kinds} onKindClick={handleKindClick} />}
+            <div className="mt-4 text-center">
+              <QuantitySelector initialQuantity={1} onQuantityChange={(newQuantity) => setQuantity(newQuantity)} />
+            </div>
           </section>
         </div>
       )}
@@ -202,21 +156,54 @@ function MainContent({ productId }) {
 
 function ProductDetail() {
   const { productId } = useParams();
+  const [quantity, setQuantity] = useState(1);
+  const [kindId, setKindId] = useState(null);
+
+  const handleAddToCart = async (kindId, quantity) => {
+    try {
+      const response = await postCart({ id: kindId, quantity });
+      const newItem = response.data.data;
+
+      // Lấy giỏ hàng từ localStorage
+      const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+      
+      // Kiểm tra xem sản phẩm đã tồn tại trong giỏ hàng chưa
+      const existingItemIndex = cartItems.findIndex(item => item.id === newItem.id);
+
+      if (existingItemIndex !== -1) {
+        // Nếu sản phẩm đã tồn tại, cập nhật số lượng
+        cartItems[existingItemIndex].quantity += newItem.quantity;
+      } else {
+        // Nếu sản phẩm chưa tồn tại, thêm mới vào giỏ hàng
+        cartItems.push(newItem);
+      }
+
+      // Lưu giỏ hàng cập nhật vào localStorage
+      localStorage.setItem('cartItems', JSON.stringify(cartItems));
+
+      console.log("Product added to cart:", newItem);
+    } catch (error) {
+      console.error("Failed to add product to cart:", error);
+    }
+  };
 
   return (
     <div className="flex flex-col bg-white">
+      <Header />
       <div className="flex flex-col items-center w-full mt-[5rem]">
-        <MainContent productId={productId} />
+        <MainContent productId={productId} onAddToCart={handleAddToCart} setKindId={setKindId} />
         <Button
           className="mt-4 px-6 py-2 mb-5 text-medium rounded-xl shadow-sm"
           style={{
             backgroundColor: "#525252", // Change this color to make the button more visible
             color: "white", // Text color
           }}
+          onClick={() => handleAddToCart(kindId, quantity)}
         >
           Add To Cart
         </Button>
       </div>
+      <Footer />
     </div>
   );
 }
