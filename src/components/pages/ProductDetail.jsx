@@ -203,7 +203,6 @@ function ProductDetail() {
           Add To Cart
         </Button>
       </div>
-      <Footer />
     </div>
   );
 }

@@ -12,7 +12,6 @@ import Transaction from "./components/admin/adminDashboard/Transaction";
 import UpdateProduct from "./components/admin/adminDashboard/UpdateProduct";
 import About from "./components/pages/About";
 import Home from "./components/pages/Home";
-import AdminCategory from "./components/admin/adminDashboard/AdminCategory"
 // import AdminProduct from "./components/admin/adminDashboard/AdminProduct"
 // import AdminCategory from "./components/admin/adminDashboard/AdminCategory"
 import Layout from "./components/layout/Layout";
@@ -23,8 +22,6 @@ import Product from "./components/pages/Product";
 import ProductDetail from "./components/pages/ProductDetail";
 import SuccessPage from './components/pages/SuccessPage';
 import "./index.css";
-import Layout from "./components/layout/Layout";
-import { NotFound } from "./components/pages/NotFound/NotFound";
 import AdminProduct from "./components/admin/adminDashboard/AdminProduct";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -40,7 +37,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <Route path="product" element={<Product />} />
           <Route path="productDetail/:productId" element={<ProductDetail />} />
           <Route path="checkout" element={<Checkout />} />
-          <Route path="/success" element={<SuccessPage />} />
+          <Route path="success" element={<SuccessPage />} />
 
           <Route path="*" element={<NotFound />} />
         </Route>
