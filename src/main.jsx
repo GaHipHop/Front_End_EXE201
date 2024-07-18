@@ -15,14 +15,16 @@ import Home from "./components/pages/Home";
 // import AdminProduct from "./components/admin/adminDashboard/AdminProduct"
 // import AdminCategory from "./components/admin/adminDashboard/AdminCategory"
 import Layout from "./components/layout/Layout";
-import Checkout from './components/pages/Checkout';
+import Checkout from "./components/pages/Checkout";
 import Login from "./components/pages/Login";
 import { NotFound } from "./components/pages/NotFound/NotFound";
 import Product from "./components/pages/Product";
 import ProductDetail from "./components/pages/ProductDetail";
-import SuccessPage from './components/pages/SuccessPage';
+import SuccessPage from "./components/pages/SuccessPage";
 import "./index.css";
 import AdminProduct from "./components/admin/adminDashboard/AdminProduct";
+import PaymentSuccess from "./components/pages/PaymentStatus/PaymentSuccess";
+import PaymentFail from "./components/pages/PaymentStatus/PaymentFail";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -38,8 +40,10 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <Route path="productDetail/:productId" element={<ProductDetail />} />
           <Route path="checkout" element={<Checkout />} />
           <Route path="success" element={<SuccessPage />} />
-
+          <Route path="payment-success" element={<PaymentSuccess />} />
+          <Route path="payment-fail" element={<PaymentFail />} />
           <Route path="*" element={<NotFound />} />
+          <Route path="fail" element={<NotFound />} />
         </Route>
 
         <Route path="admin/dashboard" element={<Dashboard />} />
