@@ -1,7 +1,9 @@
 import { Button } from "@nextui-org/react";
 import { useEffect, useState } from 'react';
 import { Link, useParams } from "react-router-dom";
-import { postCart } from '../../lib/service/cartService';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { postCart } from '../../lib/service/cartService'; // Import dịch vụ giỏ hàng
 import { GetKindById } from '../../lib/service/kindService';
 import { GetProductById } from '../../lib/service/productService';
 import Footer from "../layout/Footer";
@@ -178,7 +180,7 @@ function ProductDetail() {
       }
 
       localStorage.setItem('cartItems', JSON.stringify(cartItems));
-
+      toast.success('Add to cart successfully');
       console.log("Product added to cart:", newItem);
     } catch (error) {
       console.error("Failed to add product to cart:", error);

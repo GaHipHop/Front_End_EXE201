@@ -145,8 +145,12 @@ const createOrder = async (data) => {
   return await axios.post(`Order/createOrder`, data);
 };
 
+const createPaymentLink  = async (data) => {
+  return await axios.post(`Order/createPaymentLink`, data);
+};
+
 export {
-  createOrder, getOrderByMonthYear,
+  createOrder, createPaymentLink, getOrderByMonthYear,
   getOrdersByStatusConfirmed,
   getOrdersByStatusPending,
   getOrdersByStatusRejected,

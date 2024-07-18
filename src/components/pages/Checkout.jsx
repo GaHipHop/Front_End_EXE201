@@ -1,7 +1,7 @@
 import { Box, Button, Divider, FormControlLabel, Paper, Radio, RadioGroup, TextField, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createOrder } from '../../lib/service/orderService'; // Import hàm createOrder
+import { createOrder, createPaymentLink } from '../../lib/service/orderService';
 
 const Checkout = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -15,9 +15,17 @@ const Checkout = () => {
     district: '',
     ward: '',
     address: '',
-     orderRequirement: ''
+    orderRequirement: ''
   });
   const [paymentMethod, setPaymentMethod] = useState('ATM');
+  const [errors, setErrors] = useState({
+    fullName: false,
+    email: false,
+    phone: false,
+    city: false,
+    ward: false,
+    address: false
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,6 +37,25 @@ const Checkout = () => {
   }, [shippingFee]);
 
   const handlePayment = async () => {
+    // Kiểm tra xem các trường thông tin đã nhập đầy đủ chưa
+    if (!shippingInfo.fullName ||
+        !shippingInfo.email ||
+        !shippingInfo.phone ||
+        !shippingInfo.city ||
+        !shippingInfo.ward ||
+        !shippingInfo.address) {
+      // Cập nhật lỗi cho từng trường thông tin thiếu
+      setErrors({
+        fullName: !shippingInfo.fullName,
+        email: !shippingInfo.email,
+        phone: !shippingInfo.phone,
+        city: !shippingInfo.city,
+        ward: !shippingInfo.ward,
+        address: !shippingInfo.address
+      });
+      return;
+    }
+
     // Tạo dữ liệu order
     const orderData = {
       userName: shippingInfo.fullName,
@@ -37,7 +64,7 @@ const Checkout = () => {
       province: shippingInfo.city,
       wards: shippingInfo.ward,
       address: shippingInfo.address,
-      orderRequirement: shippingInfo.orderRequirement, // Thêm yêu cầu đặt hàng nếu có
+      orderRequirement: shippingInfo.orderRequirement,
       paymentMethod: paymentMethod,
       cartItems: cartItems.map(item => ({
         id: item.id,
@@ -50,15 +77,30 @@ const Checkout = () => {
     };
 
     try {
-      // Gọi API để tạo order
-      await createOrder(orderData);
-      console.log('Thanh toán thành công', { shippingInfo, paymentMethod });
 
-      // Xóa giỏ hàng sau khi thanh toán
-      localStorage.removeItem('cartItems');
-      setCartItems([]);
-      setTotalPrice(0);
-      navigate('/success'); // Điều hướng về trang chủ hoặc trang cảm ơn
+      let productPrice = 5000;
+
+      if (paymentMethod === 'COD') {
+          productPrice = 30000;
+         }
+      const paymentLinkData = {
+        productName: 'GaHipHop',
+        description: 'GaHipHop',
+        price: productPrice, 
+        returnUrl: "https://fustudy.azurewebsites.net/success",
+        cancelUrl: "https://fustudy.azurewebsites.net/fail",
+      };
+
+      const paymentResponse = await createPaymentLink(paymentLinkData);
+      const paymentUrl = paymentResponse.data.data;
+      console.log(paymentUrl);
+
+      if (paymentUrl) {
+        window.location.href = paymentUrl.checkoutUrl;
+        const createOrderResponse = await createOrder(orderData);
+        console.log('Create Order Response:', createOrderResponse);
+        localStorage.removeItem('cartItems');
+      }
     } catch (error) {
       console.error('Failed to create order:', error);
     }
@@ -70,6 +112,12 @@ const Checkout = () => {
       ...prevState,
       [name]: value
     }));
+    
+    // Xóa lỗi khi người dùng điền lại
+    setErrors(prevErrors => ({
+      ...prevErrors,
+      [name]: false
+    }));
   };
 
   return (
@@ -80,12 +128,15 @@ const Checkout = () => {
           <Typography variant="h6" gutterBottom>THÔNG TIN GIAO HÀNG</Typography>
           <Divider sx={{ marginBottom: 2 }} />
           <TextField 
-            label="fullName" 
+            label="Full Name" 
             name="fullName" 
             value={shippingInfo.fullName} 
             onChange={handleInputChange} 
             fullWidth 
             margin="normal" 
+            required
+            error={errors.fullName}  // Hiển thị lỗi nếu không nhập đầy đủ
+            helperText={errors.fullName ? 'Please enter your full name' : ''}
           />
           <TextField 
             label="Email" 
@@ -94,6 +145,9 @@ const Checkout = () => {
             onChange={handleInputChange} 
             fullWidth 
             margin="normal" 
+            required
+            error={errors.email}  // Hiển thị lỗi nếu không nhập đầy đủ
+            helperText={errors.email ? 'Please enter your email' : ''}
           />
           <TextField 
             label="Phone" 
@@ -102,6 +156,9 @@ const Checkout = () => {
             onChange={handleInputChange} 
             fullWidth 
             margin="normal" 
+            required
+            error={errors.phone}  // Hiển thị lỗi nếu không nhập đầy đủ
+            helperText={errors.phone ? 'Please enter your phone number' : ''}
           />
           <TextField 
             label="City/Province" 
@@ -110,6 +167,9 @@ const Checkout = () => {
             onChange={handleInputChange} 
             fullWidth 
             margin="normal" 
+            required
+            error={errors.city}  // Hiển thị lỗi nếu không nhập đầy đủ
+            helperText={errors.city ? 'Please enter your city/province' : ''}
           />
           <TextField 
             label="Ward" 
@@ -118,6 +178,9 @@ const Checkout = () => {
             onChange={handleInputChange} 
             fullWidth 
             margin="normal" 
+            required
+            error={errors.ward}  // Hiển thị lỗi nếu không nhập đầy đủ
+            helperText={errors.ward ? 'Please enter your ward' : ''}
           />
           <TextField 
             label="Street" 
@@ -126,6 +189,9 @@ const Checkout = () => {
             onChange={handleInputChange} 
             fullWidth 
             margin="normal" 
+            required
+            error={errors.address}  // Hiển thị lỗi nếu không nhập đầy đủ
+            helperText={errors.address ? 'Please enter your street address' : ''}
           />
           <TextField 
             label="Order Requirement" 
@@ -160,14 +226,10 @@ const Checkout = () => {
             </Box>
           ))}
           <Divider sx={{ marginBottom: 2 }} />
-          <Typography variant="body1">ship fees: {shippingFee.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</Typography>
+          <Typography variant="body1">Shipping Fee: {shippingFee.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</Typography>
           <Divider sx={{ marginBottom: 2 }} />
           <Typography variant="h6">Total: {totalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</Typography>
-          <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={handlePayment}
-          style={{
-            backgroundColor: "#525252", // Change this color to make the button more visible
-            color: "white", // Text color
-          }}>
+          <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={handlePayment}>
             Checkout
           </Button>
         </Paper>
