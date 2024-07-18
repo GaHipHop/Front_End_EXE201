@@ -141,8 +141,12 @@ const updateStatusOrderReject = async (orderId, token) => {
   }
 };
 
+const createOrder = async (data) => {
+  return await axios.post(`Order/createOrder`, data);
+};
+
 export {
-  getOrderByMonthYear,
+  createOrder, getOrderByMonthYear,
   getOrdersByStatusConfirmed,
   getOrdersByStatusPending,
   getOrdersByStatusRejected,

@@ -19,4 +19,5 @@ const getCartItem = async () => {
   return await axios.get(`cart/items`);
 };
 
-export { postCart, deleteCartbyid, updateCart, deleteCartClear, getCartItem };
+export { deleteCartClear, deleteCartbyid, getCartItem, postCart, updateCart };
+

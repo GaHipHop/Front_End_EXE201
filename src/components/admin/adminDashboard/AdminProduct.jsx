@@ -1,5 +1,5 @@
 import { Button } from "@nextui-org/react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getAllCategory } from "../../../lib/service/categoryService";

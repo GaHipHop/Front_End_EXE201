@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAllProduct } from '../../lib/service/productService';
-import Footer from '../layout/Footer';
 import Header from '../layout/Header';
 
 const formatPrice = (price) => {
@@ -16,8 +15,11 @@ const ProductCard = ({ imgSrc, title, color, price, currentPrice, percent, produ
   };
 
   return (
-    <div className="relative flex flex-col w-[65%] font-medium tracking-tight text-center text-black bg-white border border-black border-solid rounded-[20px] mx-2 cursor-pointer" onClick={handleClick}>
-      {percent > 0 && (
+    <div
+      className="relative flex flex-col w-[65%] font-medium tracking-tight text-center text-black bg-white border border-black border-solid rounded-[20px] mx-2 cursor-pointer"
+      onClick={handleClick}
+    >
+      {currentPrice !== price && percent > 0 && (
         <div className="absolute top-0 left-0 bg-red-500 text-white text-sm px-2 py-1 transform -rotate-45 origin-top-left">
           {percent}%
         </div>
@@ -27,7 +29,10 @@ const ProductCard = ({ imgSrc, title, color, price, currentPrice, percent, produ
       </div>
       <div className="flex flex-col px-6 py-6">
         <span className="text-lg font-semibold">{title}</span>
-        <span className={`text-xl ${currentPrice !== price ? 'line-through text-gray-500' : 'font-bold'}`} style={currentPrice !== price ? { fontSize: '1em' } : {}}>
+        <span
+          className={`text-xl ${currentPrice !== price ? 'line-through text-gray-500' : 'font-bold'}`}
+          style={currentPrice !== price ? { fontSize: '1em' } : {}}
+        >
           {formatPrice(price)}
         </span>
         {currentPrice !== price && (
@@ -40,7 +45,7 @@ const ProductCard = ({ imgSrc, title, color, price, currentPrice, percent, produ
   );
 };
 
-const MainContent = ({ products }) => (
+const MainContent = ({ products, error }) => (
   <main className="flex flex-col items-center justify-center w-full max-w-[1354px] mx-auto mt-20">
     <section className="w-full mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
       {products.length > 0 ? (
@@ -57,7 +62,7 @@ const MainContent = ({ products }) => (
           />
         ))
       ) : (
-        <div className="col-span-full text-center">No products available</div>
+        <div className="col-span-full text-center">{error || "No products available."}</div>
       )}
     </section>
     <div className="flex justify-center mt-8">
@@ -75,6 +80,7 @@ const MainContent = ({ products }) => (
 
 const Product = () => {
   const [products, setProducts] = useState([]);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -85,6 +91,7 @@ const Product = () => {
         setProducts(data.result);
       } catch (error) {
         console.error('Failed to fetch products:', error);
+        setError("Failed to fetch products.");
       }
     };
 
@@ -93,12 +100,18 @@ const Product = () => {
 
   const handleCategorySelect = (selectedProducts) => {
     setProducts(selectedProducts);
+    setError(""); // Clear any previous errors
+  };
+
+  const handleError = (message) => {
+    setError(message);
+    setProducts([]); // Clear current products
   };
 
   return (
     <div className="flex flex-col bg-white">
-      <Header onCategorySelect={handleCategorySelect} />
-      <MainContent products={products} />
+      <Header onCategorySelect={handleCategorySelect} onError={handleError} />
+      <MainContent products={products} error={error} />
     </div>
   );
 };
