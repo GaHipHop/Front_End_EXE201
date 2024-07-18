@@ -77,18 +77,18 @@ const Checkout = () => {
     };
 
     try {
-
       let productPrice = 5000;
 
       if (paymentMethod === 'COD') {
           productPrice = 30000;
          }
+
       const paymentLinkData = {
         productName: 'GaHipHop',
         description: 'GaHipHop',
         price: productPrice, 
-        returnUrl: "https://fustudy.azurewebsites.net/success",
-        cancelUrl: "https://fustudy.azurewebsites.net/fail",
+        returnUrl: "http://localhost:5174/payment-success",
+        cancelUrl: "http://localhost:5174/payment-fail",
       };
 
       const paymentResponse = await createPaymentLink(paymentLinkData);
@@ -122,7 +122,6 @@ const Checkout = () => {
 
   return (
     <Box sx={{ padding: 4, marginTop: 8 }}>
-      <Typography variant="h4" gutterBottom>Checkout</Typography>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 4 }}>
         <Paper sx={{ padding: 4, width: { xs: '100%', md: '60%' }, boxShadow: 3 }}>
           <Typography variant="h6" gutterBottom>THÔNG TIN GIAO HÀNG</Typography>
@@ -217,20 +216,35 @@ const Checkout = () => {
           {cartItems.map((item) => (
             <Box key={item.id} sx={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
               <img src={item.productImage} alt={item.productName} style={{ width: '50px', marginRight: '10px' }} />
-              <Box sx={{ flexGrow: 1 }}>
+              <Box>
                 <Typography variant="body1">{item.productName}</Typography>
-                <Typography variant="body2">Color: {item.color}</Typography>
-                <Typography variant="body2">Quantity: {item.quantity}</Typography>
-                <Typography variant="body2">Price: {item.productPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</Typography>
+                <Typography variant="body2" color="text.secondary">Quantity: {item.quantity}</Typography>
+                <Typography variant="body2" color="text.secondary">Price: {item.productPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</Typography>
               </Box>
             </Box>
           ))}
           <Divider sx={{ marginBottom: 2 }} />
-          <Typography variant="body1">Shipping Fee: {shippingFee.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</Typography>
-          <Divider sx={{ marginBottom: 2 }} />
-          <Typography variant="h6">Total: {totalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</Typography>
-          <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={handlePayment}>
-            Checkout
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Typography variant="body1">Subtotal:</Typography>
+            <Typography variant="body1">{(totalPrice - shippingFee).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</Typography>
+          </Box>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Typography variant="body1">Shipping Fee:</Typography>
+            <Typography variant="body1">{shippingFee.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</Typography>
+          </Box>
+          <Divider sx={{ marginY: 2 }} />
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Typography variant="h6">Total:</Typography>
+            <Typography variant="h6">{totalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</Typography>
+          </Box>
+          <Button 
+            variant="contained" 
+            color="primary" 
+            fullWidth 
+            onClick={handlePayment} 
+            sx={{ mt: 2 }}
+          >
+            Pay
           </Button>
         </Paper>
       </Box>

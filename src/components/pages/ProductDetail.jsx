@@ -11,11 +11,15 @@ import Header from "../layout/Header";
 
 function KindList({ kinds, onKindClick }) {
   return (
-    <div className="flex flex-wrap gap-4">
+    <div className="flex flex-wrap gap-4 justify-center">
       {kinds.map((kind, index) => (
-        <div key={index} className="w-[calc(20%-10px)] flex flex-col items-center" onClick={() => onKindClick(kind.id)}>
+        <div 
+          key={index} 
+          className="w-[calc(20%-10px)] flex flex-col items-center cursor-pointer transition-transform transform hover:scale-105" 
+          onClick={() => onKindClick(kind.id)}
+        >
           <img src={kind.image} alt={kind.colorName} className="w-[50%] h-auto" />
-          <p>{kind.colorName}</p>
+          <p className="mt-2 text-sm font-medium text-gray-700">{kind.colorName}</p>
         </div>
       ))}
     </div>
@@ -41,14 +45,14 @@ const QuantitySelector = ({ initialQuantity = 1, onQuantityChange }) => {
 
   return (
     <div className="flex items-center">
-      <Button auto light onClick={handleDecrease}>-</Button>
+      <Button auto light onClick={handleDecrease} className="px-4 py-2 bg-gray-200 rounded-l-md">-</Button>
       <input 
         type="text" 
         value={quantity} 
         readOnly 
-        className="w-12 text-center mx-2 border border-gray-300 rounded" 
+        className="w-12 text-center mx-2 border border-gray-300 rounded-none" 
       />
-      <Button auto light onClick={handleIncrease}>+</Button>
+      <Button auto light onClick={handleIncrease} className="px-4 py-2 bg-gray-200 rounded-r-md">+</Button>
     </div>
   );
 };
@@ -72,7 +76,7 @@ function MainContent({ productId, onAddToCart, setKindId }) {
         if (kindsData.length > 0) {
           const kindResponse = await GetKindById(kindsData[0].id);
           setKind(kindResponse.data.data);
-          setKindId(kindsData[0].id); // Lấy kindId đầu tiên
+          setKindId(kindsData[0].id);
         }
       } catch (error) {
         console.error('Failed to fetch product or kinds:', error);
@@ -86,16 +90,16 @@ function MainContent({ productId, onAddToCart, setKindId }) {
     try {
       const kindResponse = await GetKindById(kindId);
       setKind(kindResponse.data.data);
-      setKindId(kindId); // Cập nhật kindId khi người dùng chọn loại khác
+      setKindId(kindId);
     } catch (error) {
       console.error('Failed to fetch kind:', error);
     }
   };
 
   return (
-    <main className="px-10 py-4 w-full bg-white border-t border-black border-solid max-md:px-5 max-md:max-w-full">
+    <main className="px-10 py-4 w-full bg-white border-t border-gray-300 max-md:px-5 max-md:max-w-full">
       {kind && (
-        <div className="flex gap-3 max-md:flex-col max-md:gap-0">
+        <div className="flex gap-6 max-md:flex-col max-md:gap-4">
           <div className="flex flex-col w-[40%] max-md:w-full mx-auto">
             <div className="flex flex-col grow max-md:mt-8">
               <Link to="/product" className="hover:underline mt-8">
@@ -108,45 +112,44 @@ function MainContent({ productId, onAddToCart, setKindId }) {
               </Link>
               <div
                 className="flex flex-col justify-center mt-10 bg-white rounded-[20px] max-md:mt-8 mx-auto"
-                style={{ width: "200px", height: "200px" }} // chỉnh thông số kích thước hình
+                style={{ width: "250px", height: "250px" }}
               >
                 <img
                   loading="lazy"
                   src={kind.image}
                   alt={kind.colorName}
-                  className="w-full aspect-[0.8]"
-                  style={{ width: "100%", height: "auto" }} // Adjusted width and height
+                  className="w-full aspect-[0.8] object-cover rounded-[20px]"
                 />
               </div>
-              <p className="mt-4 text-center text-base font-medium">{kind.colorName}</p>
-              <p className="mt-1 text-center text-base">Quantity: {kind.quantity}</p>
+              <p className="mt-4 text-center text-base font-medium text-gray-800">{kind.colorName}</p>
+              <p className="mt-1 text-center text-base text-gray-600">Available: {kind.quantity}</p>
             </div>
+            {kinds.length > 0 && <KindList kinds={kinds} onKindClick={handleKindClick} />}
           </div>
           <section className="flex flex-col ml-3 w-[70%] max-md:ml-0 max-md:w-full">
             {product && (
-              <div className="flex flex-col mt-16 text-xl tracking-tight text-black max-md:mt-8">
+              <div className="flex flex-col mt-16 text-xl tracking-tight text-gray-900 max-md:mt-8">
                 <h3 className="leading-8 font-semibold">{product.productName}</h3>
-                <p className="mt-2">Category: {product.category.categoryName}</p>
+                <p className="mt-2 text-gray-700">Category: {product.category.categoryName}</p>
                 <p className="mt-5">
                   Price: {product.currentPrice !== product.productPrice ? (
                     <>
-                      <span className="line-through">{product.productPrice}đ</span> <span className="font-bold">{product.currentPrice}đ</span>
+                      <span className="line-through text-gray-500">{product.productPrice}đ</span> <span className="font-bold text-red-500">{product.currentPrice}đ</span>
                     </>
                   ) : (
-                    <span className="font-bold">{product.productPrice}đ</span>
+                    <span className="font-bold text-gray-900">{product.productPrice}đ</span>
                   )}
                 </p>
-                <p className="mt-1">Discount: {product.discount.percent}% - until {new Date(product.discount.expiredDate).toLocaleDateString()}</p>
-                <p className="mt-1">Color: {kind.colorName}</p>
-                <p className="mt-1">Quantity: {kind.quantity}</p>
-                <p className="pt-6 pb-2 mt-10 whitespace-nowrap border-b border-black border-solid max-md:mt-8">
+                <p className="mt-1 text-gray-700">Discount: {product.discount.percent}% - until {new Date(product.discount.expiredDate).toLocaleDateString()}</p>
+                <p className="mt-1 text-gray-700">Color: {kind.colorName}</p>
+                <p className="mt-1 text-gray-700">Available: {kind.quantity}</p>
+                <p className="pt-6 pb-2 mt-10 border-b border-gray-300 max-md:mt-8">
                   Description
                 </p>
-                <p className="mt-4 text-base leading-6">{product.productDescription}</p>
+                <p className="mt-4 text-base leading-6 text-gray-600">{product.productDescription}</p>
               </div>
             )}
-            {kinds.length > 0 && <KindList kinds={kinds} onKindClick={handleKindClick} />}
-            <div className="mt-4 text-center">
+            <div className="mt-6 text-center">
               <QuantitySelector initialQuantity={1} onQuantityChange={(newQuantity) => setQuantity(newQuantity)} />
             </div>
           </section>
@@ -176,7 +179,6 @@ function ProductDetail() {
         cartItems.push(newItem);
       }
 
-      // Lưu giỏ hàng cập nhật vào localStorage
       localStorage.setItem('cartItems', JSON.stringify(cartItems));
       toast.success('Add to cart successfully');
       console.log("Product added to cart:", newItem);
@@ -186,21 +188,22 @@ function ProductDetail() {
   };
 
   return (
-    <div className="flex flex-col bg-white">
+    <div className="flex flex-col bg-white min-h-screen">
       <Header />
-      <div className="flex flex-col items-center w-full mt-[5rem]">
+      <div className="flex flex-col items-center w-full mt-[5rem] px-4">
         <MainContent productId={productId} onAddToCart={handleAddToCart} setKindId={setKindId} />
         <Button
-          className="mt-4 px-6 py-2 mb-5 text-medium rounded-xl shadow-sm"
+          className="mt-8 px-8 py-3 mb-8 text-lg rounded-full shadow-lg"
           style={{
-            backgroundColor: "#525252", // Change this color to make the button more visible
-            color: "white", // Text color
+            backgroundColor: "#333333",
+            color: "white",
           }}
           onClick={() => handleAddToCart(kindId, quantity)}
         >
           Add To Cart
         </Button>
       </div>
+      <Footer />
     </div>
   );
 }
