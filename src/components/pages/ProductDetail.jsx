@@ -1,6 +1,8 @@
 import { Button } from "@nextui-org/react";
 import { useEffect, useState } from 'react';
 import { Link, useParams } from "react-router-dom";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { postCart } from '../../lib/service/cartService'; // Import dịch vụ giỏ hàng
 import { GetKindById } from '../../lib/service/kindService';
 import { GetProductById } from '../../lib/service/productService';
@@ -164,23 +166,19 @@ function ProductDetail() {
       const response = await postCart({ id: kindId, quantity });
       const newItem = response.data.data;
 
-      // Lấy giỏ hàng từ localStorage
       const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
       
-      // Kiểm tra xem sản phẩm đã tồn tại trong giỏ hàng chưa
       const existingItemIndex = cartItems.findIndex(item => item.id === newItem.id);
 
       if (existingItemIndex !== -1) {
-        // Nếu sản phẩm đã tồn tại, cập nhật số lượng
         cartItems[existingItemIndex].quantity += newItem.quantity;
       } else {
-        // Nếu sản phẩm chưa tồn tại, thêm mới vào giỏ hàng
         cartItems.push(newItem);
       }
 
       // Lưu giỏ hàng cập nhật vào localStorage
       localStorage.setItem('cartItems', JSON.stringify(cartItems));
-
+      toast.success('Add to cart successfully');
       console.log("Product added to cart:", newItem);
     } catch (error) {
       console.error("Failed to add product to cart:", error);
