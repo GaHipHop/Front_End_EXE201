@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAllProduct } from '../../lib/service/productService';
+import Footer from '../layout/Footer';
 import Header from '../layout/Header';
 
 const formatPrice = (price) => {
@@ -16,16 +17,16 @@ const ProductCard = ({ imgSrc, title, color, price, currentPrice, percent, produ
 
   return (
     <div
-      className="relative flex flex-col w-[65%] font-medium tracking-tight text-center text-black bg-white border border-black border-solid rounded-[20px] mx-2 cursor-pointer"
+      className="relative flex flex-col w-[65%] max-w-[300px] font-medium tracking-tight text-center text-black bg-white border border-gray-200 shadow-lg rounded-lg mx-2 cursor-pointer transition-transform transform hover:scale-105"
       onClick={handleClick}
     >
-      {currentPrice !== price && percent > 0 && (
-        <div className="absolute top-0 left-0 bg-red-500 text-white text-sm px-2 py-1 transform -rotate-45 origin-top-left">
+      {percent > 0 && (
+        <div className="absolute top-0 left-0 bg-red-500 text-white text-sm px-2 py-1 rounded-tr-lg">
           {percent}%
         </div>
       )}
       <div className="flex justify-center">
-        <img loading="lazy" src={imgSrc} alt={title} className="w-full h-54 object-cover rounded-t-[20px]" />
+        <img loading="lazy" src={imgSrc} alt={title} className="w-full h-54 object-cover rounded-t-lg" />
       </div>
       <div className="flex flex-col px-6 py-6">
         <span className="text-lg font-semibold">{title}</span>
@@ -45,7 +46,7 @@ const ProductCard = ({ imgSrc, title, color, price, currentPrice, percent, produ
   );
 };
 
-const MainContent = ({ products, error }) => (
+const MainContent = ({ products }) => (
   <main className="flex flex-col items-center justify-center w-full max-w-[1354px] mx-auto mt-20">
     <section className="w-full mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
       {products.length > 0 ? (
@@ -62,7 +63,7 @@ const MainContent = ({ products, error }) => (
           />
         ))
       ) : (
-        <div className="col-span-full text-center">{error || "No products available."}</div>
+        <div className="col-span-full text-center">No products available</div>
       )}
     </section>
     <div className="flex justify-center mt-8">
@@ -80,7 +81,6 @@ const MainContent = ({ products, error }) => (
 
 const Product = () => {
   const [products, setProducts] = useState([]);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -91,7 +91,6 @@ const Product = () => {
         setProducts(data.result);
       } catch (error) {
         console.error('Failed to fetch products:', error);
-        setError("Failed to fetch products.");
       }
     };
 
@@ -100,18 +99,12 @@ const Product = () => {
 
   const handleCategorySelect = (selectedProducts) => {
     setProducts(selectedProducts);
-    setError(""); // Clear any previous errors
-  };
-
-  const handleError = (message) => {
-    setError(message);
-    setProducts([]); // Clear current products
   };
 
   return (
     <div className="flex flex-col bg-white">
-      <Header onCategorySelect={handleCategorySelect} onError={handleError} />
-      <MainContent products={products} error={error} />
+      <Header onCategorySelect={handleCategorySelect} />
+      <MainContent products={products}/>
     </div>
   );
 };
