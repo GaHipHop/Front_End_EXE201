@@ -5,6 +5,7 @@ import {
   faInstagram,
   faTiktok,
 } from "@fortawesome/free-brands-svg-icons";
+import shopee from "../../assets/image/icons8-shopee-50.png"
 import { faEnvelope, faPhone } from "@fortawesome/free-solid-svg-icons";
 import { getAllContacts } from "../../lib/service/contactService";
 function PolicyList() {
@@ -101,7 +102,7 @@ function EcommerceSocial() {
       <div className="flex space-x-5">
         <a href={contact.shoppee} target="_blank" rel="noopener noreferrer">
           <img
-            src="/src/assets/image/icons8-shopee-50.png"
+            src={shopee} // Sử dụng biến hình ảnh đúng cách
             alt="shopee"
             style={{ width: "20px", height: "20px" }}
           />
